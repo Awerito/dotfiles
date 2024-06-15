@@ -14,7 +14,7 @@ rm ~/.zshrc
 
 mkdir -p ~/.local/share/fonts
 
-wget https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/UbuntuMono/Regular/complete/Ubuntu%20Mono%20Nerd%20Font%20Complete%20Mono.ttf -P ~/.local/share/fonts
+wget https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/UbuntuMono/Regular/UbuntuMonoNerdFontMono-Regular.ttf -P ~/.local/share/fonts
 
 ssh-keygen -t ed25519 -C "diego.i.munoz.viveros@gmail.com"
 

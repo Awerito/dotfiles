@@ -106,9 +106,10 @@ alias l='ls --color -lh --group-directories-first'
 alias ll='ls -alFh --group-directories-first'
 alias la='ls -Ah --group-directories-first'
 alias vimdiff='nvim -d'
+alias venv="virtualenv env"
 alias so="source env/bin/activate && clear"
 
-export PATH=$PATH::$HOME/.cargo/bin:$HOME/.local/bin:/usr/local/go/bin:$HOME/.local/scripts:$HOME/.spicetify
+export PATH=$PATH::$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin/
 DOCKER_FORMAT="\nID\t{{.ID}}\nIMAGE\t{{.Image}}\nCOMMAND\t{{.Command}}\nCREATED\t{{.RunningFor}}\nSTATUS\t{{.Status}}\nPORTS\t{{.Ports}}\nNAMES\t{{.Names}}\n"
 alias dps='docker ps --format=$DOCKER_FORMAT'
 

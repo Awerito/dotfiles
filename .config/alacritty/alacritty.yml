@@ -70,3 +70,6 @@ mouse:
     hide_when_typing: true
     hint:
         launcher: xdg-open
+
+debug:
+    prefer_egl: true

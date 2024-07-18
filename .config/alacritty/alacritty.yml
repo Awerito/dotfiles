@@ -56,12 +56,12 @@ colors:
 
 # Window size configuration
 window:
-    startup_mode: Windowed
+    startup_mode: Maximized
     decorations: none
     opacity: 0.95
     dimensions:
         columns: 205
-        lines: 61
+        lines: 70
     padding:
         x: 4
         y: 4

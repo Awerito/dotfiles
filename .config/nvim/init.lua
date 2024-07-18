@@ -504,6 +504,7 @@ require("lazy").setup({
                 "vim-language-server", -- Used for vimscript
                 "sqlls", -- Used for SQL
                 "prettierd", -- Used for javascript, html, etc.
+                "markdownlint",
             })
             require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
@@ -759,6 +760,12 @@ vim.cmd.autocmd("BufNewFile,BufRead", "vifmrc", "setlocal filetype=vim")
 
 -- Macro for marking a todo as done in md
 vim.cmd.autocmd("FileType", "markdown", "nnoremap <buffer> <leader>td :s/\\[ \\]/[x]/<CR>")
+
+-- Leader mp to open markdown preview
+vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreview<CR>")
+
+-- Leader mt formats the markdown table selected
+vim.keymap.set("v", "<leader>mt", "<cmd>'<,'>! tr -s ' ' | column -t -s '|' -o '|'<CR>")
 
 -- No wrap lines
 vim.opt.wrap = false

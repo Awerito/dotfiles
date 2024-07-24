@@ -25,6 +25,8 @@ gclone() {
     else
         git clone $1 $HOME/Git/"$2"
     fi
+
+    figlet "Git email config!"
 }
 
 
@@ -108,7 +110,7 @@ alias la='ls -Ah --group-directories-first'
 alias vimdiff='nvim -d'
 alias venv="virtualenv env"
 alias so="source env/bin/activate && clear"
-alias v="find . \( -path ./node_modules -o -path ./.git -o -path ./env -o -name '*.pyc' \) -prune -o -type f -print | fzf --tmux center --reverse | xargs -o nvim"
+alias v="find . \( -path ./node_modules -o -path ./.git -o -path ./env -o -name '*.pyc' \) -prune -o -type f -print | fzf --reverse | xargs -o nvim"
 
 export PATH=$PATH::$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin/
 DOCKER_FORMAT="\nID\t{{.ID}}\nIMAGE\t{{.Image}}\nCOMMAND\t{{.Command}}\nCREATED\t{{.RunningFor}}\nSTATUS\t{{.Status}}\nPORTS\t{{.Ports}}\nNAMES\t{{.Names}}\n"

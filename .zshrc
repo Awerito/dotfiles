@@ -121,3 +121,8 @@ figlet Awerito
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Latex
+export PATH=$PATH:/usr/local/texlive/2024/bin/x86_64-linux
+export MANPATH=$MANPATH:/usr/local/texlive/2024/texmf-dist/doc
+export INFOPATH=$INFOPATH:/usr/local/texlive/2024/texmf-dist/doc/info

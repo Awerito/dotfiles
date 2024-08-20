@@ -25,6 +25,8 @@ gclone() {
     else
         git clone $1 $HOME/Git/"$2"
     fi
+
+    figlet "Git email config!"
 }
 
 
@@ -108,7 +110,7 @@ alias la='ls -Ah --group-directories-first'
 alias vimdiff='nvim -d'
 alias venv="virtualenv env"
 alias so="source env/bin/activate && clear"
-alias v="find . \( -path ./node_modules -o -path ./.git -o -path ./env -o -name '*.pyc' \) -prune -o -type f -print | fzf --tmux center --reverse | xargs -o nvim"
+alias v="find . \( -path ./node_modules -o -path ./.git -o -path ./env -o -name '*.pyc' \) -prune -o -type f -print | fzf --reverse | xargs -o nvim"
 alias pycache="find . -type d -name "__pycache__" -exec rm -r {} +"
 
 export PATH=$PATH::$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin/
@@ -119,6 +121,7 @@ figlet Awerito
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Latex
 export PATH="$PATH:/usr/local/texlive/2024/bin/x86_64-linux"

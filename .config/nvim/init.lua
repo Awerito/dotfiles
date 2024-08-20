@@ -212,12 +212,18 @@ require("lazy").setup({
             require("which-key").setup()
 
             -- Document existing key chains
-            require("which-key").register({
-                ["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
-                ["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
-                ["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
-                ["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
-                ["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
+            require("which-key").add({
+                { "<leader>c", name = "[C]ode" },
+                { "<leader>d", name = "[D]ocument" },
+                { "<leader>g", name = "[G]it" },
+                { "<leader>h", group = "Git [H]unk", mode = { "n", "v" } },
+                { "<leader>r", name = "[R]ename" },
+                { "<leader>s", name = "[S]earch" },
+                { "<leader>t", name = "[T]oggle" },
+                { "<leader>w", name = "[W]orkspace" },
+                -- register which-key VISUAL mode
+                -- required for visual <leader>hs (hunk stage) to work
+                { "<leader>", name = "VISUAL <leader>", mode = { "v" } },
             })
         end,
     },
@@ -448,7 +454,7 @@ require("lazy").setup({
                     },
                 },
                 -- rust_analyzer = {},
-                -- tsserver = {},
+                tsserver = {},
                 html = {
                     settings = {
                         html = {
@@ -503,8 +509,7 @@ require("lazy").setup({
                 "bash-language-server", -- Used for bash
                 "vim-language-server", -- Used for vimscript
                 "sqlls", -- Used for SQL
-                "prettierd", -- Used for javascript, html, etc.
-                "markdownlint",
+                "eslint", -- Used for JavaScript
             })
             require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
@@ -538,11 +543,11 @@ require("lazy").setup({
             formatters_by_ft = {
                 lua = { "stylua" },
                 python = { "black" },
-                javascript = { { "prettierd", "prettier" } },
                 bash = { "shfmt" },
                 yml = { "prettierd" },
                 htmx = { "prettierd" },
                 json = { "jq" },
+                javascript = { "prettier" },
             },
         },
     },
@@ -713,6 +718,8 @@ require("lazy").setup({
                     "vim",
                     "vimdoc",
                     "python",
+                    "javascript",
+                    "typescript",
                 },
                 -- Autoinstall languages that are not installed
                 auto_install = true,
@@ -765,7 +772,7 @@ vim.cmd.autocmd("FileType", "markdown", "nnoremap <buffer> <leader>td :s/\\[ \\]
 vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreview<CR>")
 
 -- Leader mt formats the markdown table selected
-vim.keymap.set("v", "<leader>mt", "<cmd>'<,'>! tr -s ' ' | column -t -s '|' -o '|'<CR>")
+vim.keymap.set("v", "<leader>mt", "<cmd>'<,'>! tr -s ' ' | column -t -s '|' -o '|'<CR>", { desc = "[M]arkdown [T]able" })
 
 -- No wrap lines
 vim.opt.wrap = false

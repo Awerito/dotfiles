@@ -99,7 +99,7 @@ alias gl='git log --oneline --decorate --all --graph'
 alias e='nvim'
 alias clayton='bpython'
 alias py='python3'
-alias xtree='tree -I env -I __pycache__ -I .git -I target -C --dirsfirst'
+alias xtree='tree --gitignore --dirsfirst'
 alias yt='yt-dlp --merge-output-format mp4/mkv'
 
 alias l='ls --color -lh --group-directories-first'
@@ -109,6 +109,7 @@ alias vimdiff='nvim -d'
 alias venv="virtualenv env"
 alias so="source env/bin/activate && clear"
 alias v="find . \( -path ./node_modules -o -path ./.git -o -path ./env -o -name '*.pyc' \) -prune -o -type f -print | fzf --tmux center --reverse | xargs -o nvim"
+alias pycache="find . -type d -name "__pycache__" -exec rm -r {} +"
 
 export PATH=$PATH::$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin/
 DOCKER_FORMAT="\nID\t{{.ID}}\nIMAGE\t{{.Image}}\nCOMMAND\t{{.Command}}\nCREATED\t{{.RunningFor}}\nSTATUS\t{{.Status}}\nPORTS\t{{.Ports}}\nNAMES\t{{.Names}}\n"
@@ -118,4 +119,8 @@ figlet Awerito
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Latex
+export PATH="$PATH:/usr/local/texlive/2024/bin/x86_64-linux"
+export MANPATH="$MANPATH:/usr/local/texlive/2024/texmf-dist/doc"
+export INFOPATH="$INFOPATH:/usr/local/texlive/2024/texmf-dist/doc/info"

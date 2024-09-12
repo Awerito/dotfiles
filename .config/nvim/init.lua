@@ -440,8 +440,6 @@ require("lazy").setup({
             --  - settings (table): Override the default settings passed when initializing the server.
             --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
             local servers = {
-                -- clangd = {},
-                -- gopls = {},
                 pyright = {
                     settings = {
                         python = {
@@ -453,7 +451,6 @@ require("lazy").setup({
                         },
                     },
                 },
-                -- rust_analyzer = {},
                 tsserver = {},
                 html = {
                     settings = {
@@ -466,36 +463,21 @@ require("lazy").setup({
                     },
                 },
                 lua_ls = {
-                    -- cmd = {...},
-                    -- filetypes { ...},
-                    -- capabilities = {},
                     settings = {
                         Lua = {
                             runtime = { version = "LuaJIT" },
                             workspace = {
                                 checkThirdParty = false,
-                                -- Tells lua_ls where to find all the Lua files that you have loaded
-                                -- for your neovim configuration.
                                 library = {
                                     "${3rd}/luv/library",
                                     unpack(vim.api.nvim_get_runtime_file("", true)),
                                 },
-                                -- If lua_ls is really slow on your computer, you can try this instead:
-                                -- library = { vim.env.VIMRUNTIME },
                             },
-                            -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-                            -- diagnostics = { disable = { 'missing-fields' } },
                         },
                     },
                 },
             }
 
-            -- Ensure the servers and tools above are installed
-            --  To check the current status of installed tools and/or manually install
-            --  other tools, you can run
-            --    :Mason
-            --
-            --  You can press `g?` for help in this menu
             require("mason").setup()
 
             -- You can add other tools here that you want Mason to install
@@ -510,6 +492,7 @@ require("lazy").setup({
                 "vim-language-server", -- Used for vimscript
                 "sqlls", -- Used for SQL
                 "eslint", -- Used for JavaScript
+                "texlab", -- Used for LaTeX
             })
             require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 

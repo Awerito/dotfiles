@@ -101,7 +101,7 @@ alias gl='git log --oneline --decorate --all --graph'
 alias e='nvim'
 alias clayton='bpython'
 alias py='python3'
-alias xtree='tree --gitignore --dirsfirst'
+alias xtree='find . -type d -name "__pycache__" -exec rm -r {} + && tree --gitignore --dirsfirst'
 alias yt='yt-dlp --merge-output-format mp4/mkv'
 
 alias l='ls --color -lh --group-directories-first'
@@ -111,7 +111,6 @@ alias vimdiff='nvim -d'
 alias venv="virtualenv env"
 alias so="source env/bin/activate && clear"
 alias v="find . \( -path ./node_modules -o -path ./.git -o -path ./env -o -name '*.pyc' \) -prune -o -type f -print | fzf --reverse | xargs -o nvim"
-alias pycache="find . -type d -name "__pycache__" -exec rm -r {} +"
 
 export PATH=$PATH::$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin/
 DOCKER_FORMAT="\nID\t{{.ID}}\nIMAGE\t{{.Image}}\nCOMMAND\t{{.Command}}\nCREATED\t{{.RunningFor}}\nSTATUS\t{{.Status}}\nPORTS\t{{.Ports}}\nNAMES\t{{.Names}}\n"

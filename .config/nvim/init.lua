@@ -762,3 +762,13 @@ vim.keymap.set("v", "<leader>mt", "<cmd>'<,'>! tr -s ' ' | column -t -s '|' -o '
 
 -- No wrap lines
 vim.opt.wrap = false
+
+vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+    pattern = { "*.js", "*.jsx" }, -- Archivos .js y .jsx
+    desc = "Auto-format JS and JSX files after saving",
+    callback = function()
+        local fileName = vim.api.nvim_buf_get_name(0)
+        vim.cmd(":silent !npx prettier --write " .. fileName)
+    end,
+    group = autocmd_group,
+})

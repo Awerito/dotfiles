@@ -451,17 +451,6 @@ require("lazy").setup({
                         },
                     },
                 },
-                tsserver = {},
-                html = {
-                    settings = {
-                        html = {
-                            suggest = {
-                                -- Enable completion for all tags
-                                completeTags = true,
-                            },
-                        },
-                    },
-                },
                 lua_ls = {
                     settings = {
                         Lua = {
@@ -492,7 +481,7 @@ require("lazy").setup({
                 "vim-language-server", -- Used for vimscript
                 "sqlls", -- Used for SQL
                 "eslint", -- Used for JavaScript
-                "texlab", -- Used for LaTeX
+                "latexindent", -- Used for LaTeX
             })
             require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
@@ -706,6 +695,7 @@ require("lazy").setup({
                     "python",
                     "javascript",
                     "typescript",
+                    "latex",
                 },
                 -- Autoinstall languages that are not installed
                 auto_install = true,

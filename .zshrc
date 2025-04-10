@@ -100,7 +100,7 @@ alias gc='git checkout'
 alias gl='git log --oneline --decorate --all --graph'
 alias e='nvim'
 alias clayton='bpython'
-alias py='python3'
+alias py='python3.12'
 alias xtree='find . -type d -name "__pycache__" -exec rm -r {} + && tree --gitignore --dirsfirst'
 alias yt='yt-dlp --merge-output-format mp4/mkv'
 
@@ -112,7 +112,7 @@ alias venv="virtualenv env"
 alias so="source env/bin/activate && clear"
 alias v="find . \( -path ./node_modules -o -path ./.git -o -path ./env -o -name '*.pyc' \) -prune -o -type f -print | fzf --reverse | xargs -o nvim"
 
-export PATH=$PATH::$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin/
+export PATH=$PATH::$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin/:$HOME/.local/scripts/
 DOCKER_FORMAT="\nID\t{{.ID}}\nIMAGE\t{{.Image}}\nCOMMAND\t{{.Command}}\nCREATED\t{{.RunningFor}}\nSTATUS\t{{.Status}}\nPORTS\t{{.Ports}}\nNAMES\t{{.Names}}\n"
 alias dps='docker ps --format=$DOCKER_FORMAT'
 
@@ -126,3 +126,13 @@ export NVM_DIR="$HOME/.nvm"
 export PATH="$PATH:/usr/local/texlive/2024/bin/x86_64-linux"
 export MANPATH="$MANPATH:/usr/local/texlive/2024/texmf-dist/doc"
 export INFOPATH="$INFOPATH:/usr/local/texlive/2024/texmf-dist/doc/info"
+
+# Go lang
+export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
+
+fpath+=~/.zfunc; autoload -Uz compinit; compinit
+
+zstyle ':completion:*' menu select
+
+# yarn global bin
+export PATH="$PATH:`yarn global bin`"

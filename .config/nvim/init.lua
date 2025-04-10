@@ -151,10 +151,11 @@ require("lazy").setup({
     {
         "iamcco/markdown-preview.nvim",
         cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-        ft = { "markdown" },
-        build = function()
-            vim.fn["mkdp#util#install"]()
+        build = "cd app && yarn install",
+        init = function()
+            vim.g.mkdp_filetypes = { "markdown" }
         end,
+        ft = { "markdown" },
     },
 
     -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
@@ -482,6 +483,7 @@ require("lazy").setup({
                 "sqlls", -- Used for SQL
                 "eslint", -- Used for JavaScript
                 "latexindent", -- Used for LaTeX
+                "gopls",
             })
             require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
@@ -525,6 +527,7 @@ require("lazy").setup({
                 ts = { "prettier" },
                 tsx = { "prettier" },
                 css = { "prettierd" },
+                go = { "gofmt" },
             },
         },
     },
@@ -705,6 +708,22 @@ require("lazy").setup({
                 indent = { enable = true },
             })
         end,
+    },
+
+    {
+        "mistricky/codesnap.nvim",
+        build = "make build_generator",
+        keys = {
+            { "<leader>cc", "<cmd>CodeSnap<cr>", mode = "x", desc = "Copy code snapshot to clipboard" },
+            { "<leader>cs", "<cmd>CodeSnapSave<cr>", mode = "x", desc = "Save code snapshot to file" },
+        },
+        opts = {
+            save_path = "~/Pictures/CodeSnaps",
+            mac_window_bar = true,
+            has_breadcrumbs = false,
+            bg_theme = "peach",
+            watermark = "",
+        },
     },
 })
 

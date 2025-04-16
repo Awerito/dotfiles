@@ -206,10 +206,10 @@ require("lazy").setup({
     -- after the plugin has been loaded:
     --  config = function() ... end
 
-    { -- Useful plugin to show you pending keybinds.
+    {
         "folke/which-key.nvim",
-        event = "VimEnter", -- Sets the loading event to 'VimEnter'
-        config = function() -- This is the function that runs, AFTER loading
+        event = "VimEnter",
+        config = function()
             require("which-key").setup()
 
             -- Document existing key chains
@@ -229,71 +229,26 @@ require("lazy").setup({
         end,
     },
 
-    -- NOTE: Plugins can specify dependencies.
-    --
-    -- The dependencies are proper plugin specifications as well - anything
-    -- you do for a plugin at the top level, you can do for a dependency.
-    --
-    -- Use the `dependencies` key to specify the dependencies of a particular plugin
-
-    { -- Fuzzy Finder (files, lsp, etc)
+    {
         "nvim-telescope/telescope.nvim",
         event = "VimEnter",
         branch = "0.1.x",
         dependencies = {
             "nvim-lua/plenary.nvim",
-            { -- If encountering errors, see telescope-fzf-native README for install instructions
+            {
                 "nvim-telescope/telescope-fzf-native.nvim",
-
-                -- `build` is used to run some command when the plugin is installed/updated.
-                -- This is only run then, not every time Neovim starts up.
                 build = "make",
-
-                -- `cond` is a condition used to determine whether this plugin should be
-                -- installed and loaded.
                 cond = function()
                     return vim.fn.executable("make") == 1
                 end,
             },
             { "nvim-telescope/telescope-ui-select.nvim" },
-
-            -- Useful for getting pretty icons, but requires special font.
-            --  If you already have a Nerd Font, or terminal set up with fallback fonts
-            --  you can enable this
             { "nvim-tree/nvim-web-devicons" },
         },
         config = function()
-            -- Telescope is a fuzzy finder that comes with a lot of different things that
-            -- it can fuzzy find! It's more than just a "file finder", it can search
-            -- many different aspects of Neovim, your workspace, LSP, and more!
-            --
-            -- The easiest way to use telescope, is to start by doing something like:
-            --  :Telescope help_tags
-            --
-            -- After running this command, a window will open up and you're able to
-            -- type in the prompt window. You'll see a list of help_tags options and
-            -- a corresponding preview of the help.
-            --
-            -- Two important keymaps to use while in telescope are:
-            --  - Insert mode: <c-/>
-            --  - Normal mode: ?
-            --
-            -- This opens a window that shows you all of the keymaps for the current
-            -- telescope picker. This is really useful to discover what Telescope can
-            -- do as well as how to actually do it!
-
             -- [[ Configure Telescope ]]
             -- See `:help telescope` and `:help telescope.setup()`
             require("telescope").setup({
-                -- You can put your default mappings / updates / etc. in here
-                --  All the info you're looking for is in `:help telescope.setup()`
-                --
-                -- defaults = {
-                --   mappings = {
-                --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-                --   },
-                -- },
-                -- pickers = {}
                 extensions = {
                     ["ui-select"] = {
                         require("telescope.themes").get_dropdown(),
@@ -335,11 +290,6 @@ require("lazy").setup({
                     prompt_title = "Live Grep in Open Files",
                 })
             end, { desc = "[S]earch [/] in Open Files" })
-
-            -- Shortcut for searching your neovim configuration files
-            vim.keymap.set("n", "<leader>sn", function()
-                builtin.find_files({ cwd = vim.fn.stdpath("config") })
-            end, { desc = "[S]earch [N]eovim files" })
         end,
     },
 
@@ -352,7 +302,6 @@ require("lazy").setup({
             "WhoIsSethDaniel/mason-tool-installer.nvim",
 
             -- Useful status updates for LSP.
-            -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
             { "j-hui/fidget.nvim", opts = {} },
         },
         config = function()
@@ -404,10 +353,6 @@ require("lazy").setup({
                     --  For example, in C this would take you to the header
                     map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
 
-                    -- The following two autocommands are used to highlight references of the
-                    -- word under your cursor when your cursor rests there for a little while.
-                    --    See `:help CursorHold` for information about when this is executed
-                    --
                     -- When you move your cursor, the highlights will be cleared (the second autocommand).
                     local client = vim.lsp.get_client_by_id(event.data.client_id)
                     if client and client.server_capabilities.documentHighlightProvider then
@@ -466,6 +411,22 @@ require("lazy").setup({
                         },
                     },
                 },
+                intelephense = {
+                    init_options = {
+                        storagePath = "/tmp/intelephense",
+                        licenseKey = "intelephense@free",
+                    },
+                    settings = {
+                        intelephense = {
+                            files = {
+                                maxSize = 5000000,
+                            },
+                            format = {
+                                enable = true,
+                            },
+                        },
+                    },
+                },
             }
 
             require("mason").setup()
@@ -483,11 +444,24 @@ require("lazy").setup({
                 "sqlls", -- Used for SQL
                 "eslint", -- Used for JavaScript
                 "latexindent", -- Used for LaTeX
-                "gopls",
+                "gopls", -- Used for Go
+                "intelephense", -- Used for PHP
             })
             require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
             require("mason-lspconfig").setup({
+                ensure_installed = {
+                    "lua_ls",
+                    "pyright",
+                    "clangd",
+                    "bashls",
+                    "vimls",
+                    "sqlls",
+                    "eslint",
+                    "gopls",
+                    "intelephense",
+                },
+                automatic_installation = true,
                 handlers = {
                     function(server_name)
                         local server = servers[server_name] or {}
@@ -511,7 +485,7 @@ require("lazy").setup({
         opts = {
             notify_on_error = false,
             format_on_save = {
-                timeout_ms = 500,
+                timeout_ms = 5000, -- 5 second timeout
                 lsp_fallback = true,
             },
             formatters_by_ft = {
@@ -522,12 +496,19 @@ require("lazy").setup({
                 htmx = { "prettierd" },
                 html = { "prettierd" },
                 json = { "jq" },
-                js = { "prettier" },
-                jsx = { "prettier" },
-                ts = { "prettier" },
-                tsx = { "prettier" },
+                javascript = { "prettier" },
+                javascriptreact = { "prettier" },
+                typescript = { "prettier" },
+                typescriptreact = { "prettier" },
                 css = { "prettierd" },
                 go = { "gofmt" },
+                php = { "php_cs_fixer" },
+            },
+            formatters = {
+                php_cs_fixer = {
+                    command = "php-cs-fixer",
+                    args = { "fix", "$FILENAME", "--rules=@PSR12", "--using-cache=no", "--dry-run" },
+                },
             },
         },
     },
@@ -773,13 +754,3 @@ vim.keymap.set("v", "<leader>mt", "<cmd>'<,'>! tr -s ' ' | column -t -s '|' -o '
 
 -- No wrap lines
 vim.opt.wrap = false
-
-vim.api.nvim_create_autocmd({ "BufWritePost" }, {
-    pattern = { "*.js", "*.jsx" }, -- Archivos .js y .jsx
-    desc = "Auto-format JS and JSX files after saving",
-    callback = function()
-        local fileName = vim.api.nvim_buf_get_name(0)
-        vim.cmd(":silent !prettier --write " .. fileName)
-    end,
-    group = autocmd_group,
-})

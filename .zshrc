@@ -112,7 +112,7 @@ alias venv="virtualenv env"
 alias so="source env/bin/activate && clear"
 alias v="find . \( -path ./node_modules -o -path ./.git -o -path ./env -o -name '*.pyc' \) -prune -o -type f -print | fzf --reverse | xargs -o nvim"
 
-export PATH=$PATH::$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin/:$HOME/.local/scripts/
+export PATH=$PATH::$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin/:$HOME/.local/scripts
 DOCKER_FORMAT="\nID\t{{.ID}}\nIMAGE\t{{.Image}}\nCOMMAND\t{{.Command}}\nCREATED\t{{.RunningFor}}\nSTATUS\t{{.Status}}\nPORTS\t{{.Ports}}\nNAMES\t{{.Names}}\n"
 alias dps='docker ps --format=$DOCKER_FORMAT'
 

@@ -124,6 +124,8 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+-- vim.g.sleuth_excluded_filetypes = { "python" }
+
 require("lazy").setup({
 
     -- [[ Plugin Specs list ]]
@@ -145,6 +147,10 @@ require("lazy").setup({
             vim.g.gruvbox_material_statusline_style = "default"
             vim.g.gruvbox_material_sign_column_background = "none"
             vim.cmd.colorscheme("gruvbox-material")
+            -- Override highlight groups used by LSP
+            vim.api.nvim_set_hl(0, "LspReferenceText", { bg = "#504945", bold = true })
+            vim.api.nvim_set_hl(0, "LspReferenceRead", { bg = "#504945", bold = true })
+            vim.api.nvim_set_hl(0, "LspReferenceWrite", { bg = "#7c6f64", bold = true })
         end,
     },
 
@@ -420,7 +426,8 @@ require("lazy").setup({
                 "eslint", -- Used for JavaScript
                 "latexindent", -- Used for LaTeX
                 "gopls", -- Used for Go
-                "intelephense", -- Used for PHP
+                "prettier", -- Used for formatting JavaScript/TypeScript
+                "prettierd", -- Used for formatting HTML/CSS
             })
             require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
@@ -434,7 +441,6 @@ require("lazy").setup({
                     "sqlls",
                     "eslint",
                     "gopls",
-                    "intelephense",
                 },
                 automatic_installation = true,
                 handlers = {
@@ -681,9 +687,6 @@ vim.keymap.set("i", "<C-f>", "<C-g>u<Esc>[s1z=`]a<C-g>u", { desc = "[F]ix last m
 
 -- Set syntax highlighting for vifmrc file like vimrc
 vim.cmd.autocmd("BufNewFile,BufRead", "vifmrc", "setlocal filetype=vim")
-
--- Macro for marking a todo as done in md
-vim.cmd.autocmd("FileType", "markdown", "nnoremap <buffer> <leader>td :s/\\[ \\]/[x]/<CR>")
 
 -- Leader mp to open markdown preview
 vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreview<CR>")

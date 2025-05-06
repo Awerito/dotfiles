@@ -134,5 +134,5 @@ fpath+=~/.zfunc; autoload -Uz compinit; compinit
 
 zstyle ':completion:*' menu select
 
-# yarn global bin
-export PATH="$PATH:`yarn global bin`"
+# # yarn global bin
+# export PATH="$PATH:`yarn global bin`"

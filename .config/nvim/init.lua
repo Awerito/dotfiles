@@ -140,11 +140,7 @@ require("lazy").setup({
     -- Markdown preview
     {
         "iamcco/markdown-preview.nvim",
-        cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-        build = "cd app && yarn install",
-        init = function()
-            vim.g.mkdp_filetypes = { "markdown" }
-        end,
+        build = ":call mkdp#util#install()",
         ft = { "markdown" },
     },
 
@@ -350,7 +346,6 @@ require("lazy").setup({
 
             require("mason-lspconfig").setup({
                 ensure_installed = {
-                    "jq",
                     "lua_ls",
                     "pyright",
                     "clangd",

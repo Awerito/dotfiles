@@ -327,6 +327,7 @@ require("lazy").setup({
                         },
                     },
                 },
+                ts_ls = {},
             }
 
             require("mason").setup()
@@ -341,6 +342,7 @@ require("lazy").setup({
                 "eslint", -- Used for JavaScript
                 "prettier", -- Used for formatting JavaScript/TypeScript
                 "prettierd", -- Used for formatting HTML/CSS
+                "ts_ls", -- TypeScript/JavaScript Language Server
             })
             require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
@@ -351,6 +353,7 @@ require("lazy").setup({
                     "clangd",
                     "sqlls",
                     "eslint",
+                    "ts_ls",
                 },
                 automatic_installation = true,
                 handlers = {

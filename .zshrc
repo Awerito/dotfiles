@@ -4,9 +4,25 @@ export ZSH="$HOME/.oh-my-zsh"
 # Theme
 ZSH_THEME="robbyrussell"
 
-DISABLE_AUTO_UPDATE="true"
+DISABLE_AUTO_UPDATE="false"
 ENABLE_CORRECTION="true"
-plugins=(git git-auto-fetch vi-mode poetry)
+
+# Ensure zsh-autosuggestions is installed
+if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" ]; then
+  git clone https://github.com/zsh-users/zsh-autosuggestions \
+    ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions &>/dev/null
+fi
+
+# Ensure zsh-syntax-highlighting is installed
+if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting" ]; then
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
+    ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting &>/dev/null
+fi
+
+plugins=(git git-auto-fetch vi-mode poetry zsh-autosuggestions zsh-syntax-highlighting)
+
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+bindkey '^V' autosuggest-disable  # example: Ctrl+V disables autosuggestions
 
 source $ZSH/oh-my-zsh.sh
 

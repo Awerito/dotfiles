@@ -112,9 +112,25 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     -- [[ Plugin Specs list ]]
-    -- Copilot
-    "github/copilot.vim",
+    {
+        "coder/claudecode.nvim",
+        dependencies = { "folke/snacks.nvim" },
+        config = true,
+        keys = {
+            -- Toggle Claude Code
+            { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
 
+            -- Enviar selección visual a Claude
+            { "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send to Claude" },
+
+            -- Agregar archivo actual al contexto
+            { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add current buffer" },
+
+            -- Aceptar/rechazar cambios
+            { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
+            { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
+        },
+    },
     -- Colorscheme
     {
         "sainnhe/gruvbox-material",
@@ -184,6 +200,7 @@ require("lazy").setup({
                 -- register which-key VISUAL mode
                 -- required for visual <leader>hs (hunk stage) to work
                 { "<leader>", name = "VISUAL <leader>", mode = { "v" } },
+                { "<leader>a", name = "[A]I/Claude" },
             })
         end,
     },

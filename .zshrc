@@ -104,6 +104,8 @@ gitpush() {
     fi
 }
 
+gi() { curl -sLw "\n" "https://www.toptal.com/developers/gitignore/api/$(IFS=,; echo "$*")"; }
+
 # Aliases
 alias update='sudo apt update && sudo apt upgrade -y'
 alias clean='sudo apt autoremove -y'
@@ -120,6 +122,7 @@ alias clayton='bpython'
 alias py='python3.12'
 alias xtree='find . -type d -name "__pycache__" -exec rm -r {} + && tree --gitignore --dirsfirst'
 alias yt='yt-dlp --merge-output-format mp4/mkv'
+alias md2pdf='f=$(ls *.md); pandoc -t beamer --pdf-engine=xelatex "$f" -o "${f%.md}.pdf"'
 
 alias l='ls --color -lh --group-directories-first'
 alias ll='ls -alFh --group-directories-first'

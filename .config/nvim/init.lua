@@ -115,6 +115,7 @@ require("lazy").setup({
     {
         "coder/claudecode.nvim",
         dependencies = { "folke/snacks.nvim" },
+        build = "npm install -g claude-code",
         config = true,
         keys = {
             -- Toggle Claude Code

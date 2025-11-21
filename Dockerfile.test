@@ -1,0 +1,22 @@
+FROM ubuntu:22.04
+
+# Evitar prompts interactivos
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instalar dependencias mínimas
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+# Crear un usuario no-root con sudo
+RUN useradd -m -s /bin/bash testuser && \
+    echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Cambiar al usuario no-root
+USER testuser
+WORKDIR /home/testuser
+
+# Punto de entrada
+CMD ["/bin/bash"]

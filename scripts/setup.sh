@@ -95,16 +95,26 @@ fi
 # NEOVIM TEXT EDITOR
 # ============================================
 if ! command_exists nvim; then
-    print_step "Installing Neovim..."
-    # Download latest stable AppImage
-    run_command "curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage"
-    run_command "chmod u+x nvim.appimage"
-    # Extract and install to system
-    run_command "./nvim.appimage --appimage-extract"
-    run_command "sudo mv squashfs-root /opt/nvim"
-    run_command "sudo ln -sf /opt/nvim/AppRun /usr/local/bin/nvim"
-    run_command "rm nvim.appimage"
-    print_success "Neovim installed"
+    print_step "Installing Neovim from source..."
+
+    # Install build dependencies
+    print_step "Installing Neovim build dependencies..."
+    run_command "sudo apt install -y ninja-build gettext cmake unzip curl build-essential"
+
+    # Clone Neovim repository
+    print_step "Cloning Neovim repository..."
+    run_command "cd /tmp && git clone https://github.com/neovim/neovim.git"
+
+    # Build and install stable version
+    print_step "Building Neovim (this may take a few minutes)..."
+    run_command "cd /tmp/neovim && git checkout stable"
+    run_command "cd /tmp/neovim && make CMAKE_BUILD_TYPE=Release"
+    run_command "cd /tmp/neovim && sudo make install"
+
+    # Cleanup
+    run_command "rm -rf /tmp/neovim"
+
+    print_success "Neovim installed from source"
 else
     print_success "Neovim already installed"
 fi
@@ -238,7 +248,9 @@ print_success "Dotfiles applied successfully"
 # ============================================
 if [ "$SHELL" != "$(which zsh)" ]; then
     print_step "Changing default shell to Zsh..."
-    run_command "chsh -s '$(which zsh)'"
+    # Use sudo chsh to avoid interactive password prompt and session interruption
+    # This changes the default shell without starting a new zsh session
+    run_command "sudo chsh -s '$(which zsh)' '$USER'"
     print_success "Default shell changed to Zsh (restart terminal to apply)"
 else
     print_success "Zsh is already the default shell"

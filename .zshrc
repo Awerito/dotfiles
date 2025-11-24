@@ -24,6 +24,10 @@ bindkey '^V' autosuggest-disable
 
 source $ZSH/oh-my-zsh.sh
 
+if [[ -n $SSH_CONNECTION ]]; then
+  PROMPT='🔴 '$PROMPT
+fi
+
 # ============================================
 # EDITOR & TERMINAL
 # ============================================

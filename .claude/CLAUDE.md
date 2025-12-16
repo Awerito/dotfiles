@@ -8,6 +8,13 @@
 - Write all code comments in English
 - Only use Spanish if explicitly requested otherwise
 
+## Code Formatting
+- **CRITICAL**: Always format generated code to match the project's formatter configuration
+- **Python**: Format with `black` (line length 88, default settings)
+- **JavaScript/TypeScript** (`.js`, `.jsx`, `.ts`, `.tsx`): Format with `prettier`
+- **HTML/CSS/JSON/YAML**: Format with `prettier`
+- Ensure consistent indentation and spacing in all generated code
+
 ## Tool and Package Installation Guidelines
 - **CRITICAL**: Always check official documentation before suggesting commands or configurations
 - **CRITICAL**: Verify current versions and avoid deprecated features/functions

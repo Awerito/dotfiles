@@ -85,25 +85,24 @@ fi
 # Install Oh My Zsh framework
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
     print_step "Installing Oh My Zsh..."
-    run_command 'RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+    run_command 'CHSH=no RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended'
     print_success "Oh My Zsh installed"
 else
     print_success "Oh My Zsh already installed"
 fi
 
 # ============================================
-# NEOVIM TEXT EDITOR
+# NEOVIM TEXT EDITOR (from source)
 # ============================================
 if ! command_exists nvim; then
-    print_step "Installing Neovim..."
-    # Download latest stable AppImage
-    run_command "curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage"
-    run_command "chmod u+x nvim.appimage"
-    # Extract and install to system
-    run_command "./nvim.appimage --appimage-extract"
-    run_command "sudo mv squashfs-root /opt/nvim"
-    run_command "sudo ln -sf /opt/nvim/AppRun /usr/local/bin/nvim"
-    run_command "rm nvim.appimage"
+    print_step "Installing Neovim from source..."
+    # Install build dependencies
+    run_command "sudo apt install -y ninja-build gettext cmake curl build-essential"
+    # Clone and build
+    run_command "git clone --depth 1 --branch stable https://github.com/neovim/neovim.git /tmp/neovim"
+    run_command "make -C /tmp/neovim CMAKE_BUILD_TYPE=Release"
+    run_command "sudo make -C /tmp/neovim install"
+    run_command "rm -rf /tmp/neovim"
     print_success "Neovim installed"
 else
     print_success "Neovim already installed"
@@ -161,6 +160,7 @@ if ! command_exists kitty; then
     run_command "sudo ln -sf ~/.local/kitty.app/bin/kitty /usr/local/bin/"
     run_command "sudo ln -sf ~/.local/kitty.app/bin/kitten /usr/local/bin/"
     # Add desktop integration
+    run_command "mkdir -p ~/.local/share/applications"
     run_command "cp ~/.local/kitty.app/share/applications/kitty.desktop ~/.local/share/applications/"
     run_command 'sed -i "s|Icon=kitty|Icon=$HOME/.local/kitty.app/share/icons/hicolor/256x256/apps/kitty.png|g" ~/.local/share/applications/kitty.desktop'
     print_success "Kitty terminal installed"
@@ -173,6 +173,8 @@ fi
 # ============================================
 if ! command_exists fastfetch; then
     print_step "Installing Fastfetch..."
+    # Install software-properties-common for add-apt-repository
+    run_command "sudo apt install -y software-properties-common"
     # Add PPA repository
     run_command "sudo add-apt-repository ppa:zhangsongcui3371/fastfetch -y"
     run_command "sudo apt update"
@@ -186,6 +188,7 @@ fi
 # NERD FONTS (Patched fonts with icons)
 # ============================================
 print_step "Installing Nerd Fonts..."
+run_command "sudo apt install -y fontconfig wget"
 FONT_DIR="$HOME/.local/share/fonts"
 run_command "mkdir -p '$FONT_DIR'"
 
@@ -238,7 +241,7 @@ print_success "Dotfiles applied successfully"
 # ============================================
 if [ "$SHELL" != "$(which zsh)" ]; then
     print_step "Changing default shell to Zsh..."
-    run_command "chsh -s '$(which zsh)'"
+    run_command "sudo chsh -s '$(which zsh)' '$(whoami)'"
     print_success "Default shell changed to Zsh (restart terminal to apply)"
 else
     print_success "Zsh is already the default shell"

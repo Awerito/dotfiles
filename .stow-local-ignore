@@ -24,3 +24,5 @@ _darcs
 
 scripts
 .config/nvim/lazy-lock.json
+CLAUDE.md
+Dockerfile.test

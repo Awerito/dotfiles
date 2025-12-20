@@ -9,11 +9,17 @@
 - Only use Spanish if explicitly requested otherwise
 
 ## Code Formatting
-- **CRITICAL**: Always format generated code to match the project's formatter configuration
+- **CRITICAL**: Write code ALREADY FORMATTED as the formatter would output it
+- **CRITICAL**: The goal is that when the user opens a file in nvim, conform.nvim does NOT make any changes
 - **Python**: Format with `black` (line length 88, default settings)
 - **JavaScript/TypeScript** (`.js`, `.jsx`, `.ts`, `.tsx`): Format with `prettier`
+  - Use double quotes `"`, not single quotes `'`
+  - Always include semicolons
+  - Break long lines as prettier would
 - **HTML/CSS/JSON/YAML**: Format with `prettier`
+  - Break long attributes onto multiple lines as prettier does
 - Ensure consistent indentation and spacing in all generated code
+- NEVER write code that will be reformatted when opened - get it right the first time
 
 ## Tool and Package Installation Guidelines
 - **CRITICAL**: Always check official documentation before suggesting commands or configurations

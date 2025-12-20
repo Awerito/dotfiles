@@ -58,17 +58,39 @@ run_command() {
 }
 
 # ============================================
+# BOOTSTRAP (minimum to clone repo)
+# ============================================
+print_step "Installing bootstrap packages (git, curl, stow)..."
+run_command "sudo apt update"
+run_command "sudo apt install -y git curl stow"
+print_success "Bootstrap packages installed"
+
+# ============================================
+# CLONE DOTFILES REPOSITORY
+# ============================================
+DOTFILES_DIR="$HOME/.dotfiles"
+DOTFILES_REPO="https://github.com/Awerito/dotfiles.git"
+
+if [ ! -d "$DOTFILES_DIR" ]; then
+    print_step "Cloning dotfiles repository..."
+    run_command "git clone '$DOTFILES_REPO' '$DOTFILES_DIR'"
+    print_success "Dotfiles repository cloned"
+else
+    print_success "Dotfiles directory already exists"
+fi
+
+# ============================================
 # SYSTEM UPDATE
 # ============================================
-print_step "Updating system packages..."
-run_command "sudo apt update && sudo apt upgrade -y"
+print_step "Updating and upgrading system packages..."
+run_command "sudo apt upgrade -y"
 print_success "System updated"
 
 # ============================================
 # ESSENTIAL PACKAGES
 # ============================================
 print_step "Installing essential packages..."
-run_command "sudo apt install -y git curl wget stow build-essential xclip ripgrep fd-find fzf tree unzip 7zip htop"
+run_command "sudo apt install -y wget build-essential xclip ripgrep fd-find fzf tree unzip 7zip htop"
 print_success "Essential packages installed"
 
 # ============================================

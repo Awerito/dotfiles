@@ -60,11 +60,6 @@ RUN mkdir -p /root/.local/share/fonts && \
     -P /root/.local/share/fonts && \
     fc-cache -fv
 
-# ============================================
-# PYTHON TOOLS
-# ============================================
-RUN pip3 install --break-system-packages bpython
-
 # Marker file to verify image
 RUN echo "dotfiles-base-ready" > /root/.dotfiles-base-marker
 

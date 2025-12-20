@@ -26,3 +26,5 @@ scripts
 .config/nvim/lazy-lock.json
 CLAUDE.md
 Dockerfile.test
+Dockerfile.base
+.github

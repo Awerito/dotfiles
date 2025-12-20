@@ -2,297 +2,158 @@
 
 # ============================================
 # Dotfiles Setup Script
-# Ubuntu-based systems (Debian, Pop!_OS, etc.)
+# "From zero to hero" - User no thinks
 # ============================================
 
-# Parse command line arguments
-DRY_RUN=false
-if [[ "$1" == "--dry-run" ]] || [[ "$1" == "--test" ]]; then
-    DRY_RUN=true
-    echo "🔍 DRY RUN MODE - No changes will be made"
-    echo ""
-fi
+set -e
 
-set -e  # Exit on error
-
-# Color codes for terminal output
+# Color codes
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Helper functions for colored output
-print_step() {
-    if [ "$DRY_RUN" = true ]; then
-        echo -e "${BLUE}[DRY RUN]${NC} Would execute: $1"
-    else
-        echo -e "${BLUE}==>${NC} $1"
-    fi
-}
+print_step() { echo -e "${BLUE}==>${NC} $1"; }
+print_success() { echo -e "${GREEN}✓${NC} $1"; }
+print_warning() { echo -e "${YELLOW}⚠${NC} $1"; }
+print_error() { echo -e "${RED}✗${NC} $1"; }
 
-print_success() {
-    echo -e "${GREEN}✓${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}⚠${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}✗${NC} $1"
-}
-
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
-
-# Command wrapper that respects dry-run mode
-run_command() {
-    if [ "$DRY_RUN" = true ]; then
-        echo -e "${YELLOW}  [SKIP]${NC} $*"
-        return 0
-    else
-        eval "$@"
-    fi
-}
-
-# ============================================
-# BOOTSTRAP (minimum to clone repo)
-# ============================================
-print_step "Installing bootstrap packages (git, curl, stow)..."
-run_command "sudo apt update"
-run_command "sudo apt install -y git curl stow"
-print_success "Bootstrap packages installed"
-
-# ============================================
-# CLONE DOTFILES REPOSITORY
-# ============================================
-DOTFILES_DIR="$HOME/.dotfiles"
+# Config
 DOTFILES_REPO="https://github.com/Awerito/dotfiles.git"
+DOTFILES_DIR="$HOME/.dotfiles"
+BASE_IMAGE="ghcr.io/awerito/dotfiles-base:latest"
+CONTAINER_NAME="dotfiles-tmp-$$"
 
-if [ ! -d "$DOTFILES_DIR" ]; then
-    print_step "Cloning dotfiles repository..."
-    run_command "git clone '$DOTFILES_REPO' '$DOTFILES_DIR'"
-    print_success "Dotfiles repository cloned"
-else
-    print_success "Dotfiles directory already exists"
+# ============================================
+# INSTALL DOCKER
+# ============================================
+if ! command -v docker &> /dev/null; then
+    print_step "Installing Docker..."
+    sudo apt-get update
+    sudo apt-get install -y ca-certificates curl gnupg
+    sudo install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    sudo chmod a+r /etc/apt/keyrings/docker.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt-get update
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+    sudo usermod -aG docker "$USER"
+    print_success "Docker installed"
 fi
 
 # ============================================
-# SYSTEM UPDATE
+# PULL BASE IMAGE
 # ============================================
-print_step "Updating and upgrading system packages..."
-run_command "sudo apt upgrade -y"
-print_success "System updated"
+print_step "Pulling pre-built base image..."
+sudo docker pull "$BASE_IMAGE"
+print_success "Base image ready"
 
 # ============================================
-# ESSENTIAL PACKAGES
+# EXTRACT PRE-BUILT TOOLS
 # ============================================
-print_step "Installing essential packages..."
-run_command "sudo apt install -y wget build-essential xclip ripgrep fd-find fzf tree unzip 7zip htop"
-print_success "Essential packages installed"
+print_step "Extracting pre-built tools..."
+sudo docker create --name "$CONTAINER_NAME" "$BASE_IMAGE"
+
+# Neovim
+sudo docker cp "$CONTAINER_NAME:/usr/local/bin/nvim" /usr/local/bin/
+sudo docker cp "$CONTAINER_NAME:/usr/local/lib/nvim" /usr/local/lib/
+sudo docker cp "$CONTAINER_NAME:/usr/local/share/nvim" /usr/local/share/
+print_success "Neovim installed"
+
+# Oh My Zsh
+docker cp "$CONTAINER_NAME:/root/.oh-my-zsh" "$HOME/.oh-my-zsh"
+print_success "Oh My Zsh installed"
+
+# NVM + Node
+docker cp "$CONTAINER_NAME:/root/.nvm" "$HOME/.nvm"
+print_success "NVM + Node installed"
+
+# Kitty
+mkdir -p "$HOME/.local"
+docker cp "$CONTAINER_NAME:/root/.local/kitty.app" "$HOME/.local/kitty.app"
+sudo ln -sf "$HOME/.local/kitty.app/bin/kitty" /usr/local/bin/
+sudo ln -sf "$HOME/.local/kitty.app/bin/kitten" /usr/local/bin/
+mkdir -p "$HOME/.local/share/applications"
+cp "$HOME/.local/kitty.app/share/applications/kitty.desktop" "$HOME/.local/share/applications/"
+sed -i "s|Icon=kitty|Icon=$HOME/.local/kitty.app/share/icons/hicolor/256x256/apps/kitty.png|g" "$HOME/.local/share/applications/kitty.desktop"
+print_success "Kitty terminal installed"
+
+# Nerd Fonts
+mkdir -p "$HOME/.local/share/fonts"
+docker cp "$CONTAINER_NAME:/root/.local/share/fonts/." "$HOME/.local/share/fonts/"
+fc-cache -fv > /dev/null 2>&1
+print_success "Nerd Fonts installed"
+
+# Cleanup container
+sudo docker rm "$CONTAINER_NAME" > /dev/null
+print_success "Cleanup done"
 
 # ============================================
-# ZSH SHELL
+# INSTALL SYSTEM PACKAGES
 # ============================================
-if ! command_exists zsh; then
-    print_step "Installing Zsh..."
-    run_command "sudo apt install -y zsh"
-    print_success "Zsh installed"
-else
-    print_success "Zsh already installed"
-fi
-
-# Install Oh My Zsh framework
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    print_step "Installing Oh My Zsh..."
-    run_command 'CHSH=no RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended'
-    print_success "Oh My Zsh installed"
-else
-    print_success "Oh My Zsh already installed"
-fi
+print_step "Installing system packages..."
+sudo apt-get update
+sudo apt-get install -y git curl wget stow zsh xclip ripgrep fd-find fzf tree unzip 7zip htop fontconfig python3-pip python3-venv
+print_success "System packages installed"
 
 # ============================================
-# NEOVIM TEXT EDITOR (from source)
+# INSTALL FASTFETCH (needs PPA)
 # ============================================
-if ! command_exists nvim; then
-    print_step "Installing Neovim from source..."
-    # Install build dependencies
-    run_command "sudo apt install -y ninja-build gettext cmake curl build-essential"
-    # Clone and build
-    run_command "git clone --depth 1 --branch stable https://github.com/neovim/neovim.git /tmp/neovim"
-    run_command "make -C /tmp/neovim CMAKE_BUILD_TYPE=Release"
-    run_command "sudo make -C /tmp/neovim install"
-    run_command "rm -rf /tmp/neovim"
-    print_success "Neovim installed"
-else
-    print_success "Neovim already installed"
-fi
-
-# ============================================
-# NODE.JS RUNTIME (via NVM)
-# ============================================
-if [ ! -d "$HOME/.nvm" ]; then
-    print_step "Installing NVM (Node Version Manager)..."
-    run_command 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash'
-
-    # Load NVM into current shell
-    if [ "$DRY_RUN" = false ]; then
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    fi
-
-    print_success "NVM installed"
-else
-    print_success "NVM already installed"
-    if [ "$DRY_RUN" = false ]; then
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    fi
-fi
-
-# Install Node.js LTS version
-if ! command_exists node; then
-    print_step "Installing Node.js LTS..."
-    run_command "nvm install --lts"
-    run_command "nvm use --lts"
-    print_success "Node.js installed"
-else
-    print_success "Node.js already installed ($(node --version))"
-fi
-
-# Install Claude Code CLI globally via npm
-if ! command_exists claude-code; then
-    print_step "Installing Claude Code CLI..."
-    run_command "npm install -g @anthropic-ai/claude-code"
-    print_success "Claude Code CLI installed"
-else
-    print_success "Claude Code CLI already installed"
-fi
-
-# ============================================
-# KITTY TERMINAL EMULATOR
-# ============================================
-if ! command_exists kitty; then
-    print_step "Installing Kitty terminal..."
-    # Install via official installer
-    run_command 'curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin'
-    # Create system-wide symbolic links
-    run_command "sudo ln -sf ~/.local/kitty.app/bin/kitty /usr/local/bin/"
-    run_command "sudo ln -sf ~/.local/kitty.app/bin/kitten /usr/local/bin/"
-    # Add desktop integration
-    run_command "mkdir -p ~/.local/share/applications"
-    run_command "cp ~/.local/kitty.app/share/applications/kitty.desktop ~/.local/share/applications/"
-    run_command 'sed -i "s|Icon=kitty|Icon=$HOME/.local/kitty.app/share/icons/hicolor/256x256/apps/kitty.png|g" ~/.local/share/applications/kitty.desktop'
-    print_success "Kitty terminal installed"
-else
-    print_success "Kitty terminal already installed"
-fi
-
-# ============================================
-# FASTFETCH (System Information Tool)
-# ============================================
-if ! command_exists fastfetch; then
+if ! command -v fastfetch &> /dev/null; then
     print_step "Installing Fastfetch..."
-    # Install software-properties-common for add-apt-repository
-    run_command "sudo apt install -y software-properties-common"
-    # Add PPA repository
-    run_command "sudo add-apt-repository ppa:zhangsongcui3371/fastfetch -y"
-    run_command "sudo apt update"
-    run_command "sudo apt install -y fastfetch"
+    sudo apt-get install -y software-properties-common
+    sudo add-apt-repository ppa:zhangsongcui3371/fastfetch -y
+    sudo apt-get update
+    sudo apt-get install -y fastfetch
     print_success "Fastfetch installed"
+fi
+
+# ============================================
+# CLONE DOTFILES
+# ============================================
+if [ ! -d "$DOTFILES_DIR" ]; then
+    print_step "Cloning dotfiles..."
+    git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
+    print_success "Dotfiles cloned"
 else
-    print_success "Fastfetch already installed"
+    print_success "Dotfiles already exist"
 fi
 
 # ============================================
-# NERD FONTS (Patched fonts with icons)
+# APPLY DOTFILES WITH STOW
 # ============================================
-print_step "Installing Nerd Fonts..."
-run_command "sudo apt install -y fontconfig wget"
-FONT_DIR="$HOME/.local/share/fonts"
-run_command "mkdir -p '$FONT_DIR'"
+print_step "Applying dotfiles..."
 
-if [ ! -f "$FONT_DIR/UbuntuMonoNerdFontMono-Regular.ttf" ]; then
-    # Download Ubuntu Mono Nerd Font
-    run_command "wget -q https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/UbuntuMono/Regular/UbuntuMonoNerdFontMono-Regular.ttf -P '$FONT_DIR'"
-    # Rebuild font cache
-    run_command "fc-cache -fv"
-    print_success "Nerd Fonts installed"
-else
-    print_success "Nerd Fonts already installed"
-fi
-
-# ============================================
-# PYTHON DEVELOPMENT TOOLS (Optional)
-# ============================================
-if command_exists python3; then
-    print_step "Installing Python development tools..."
-    # Install pip and virtual environment tools
-    run_command "sudo apt install -y python3-pip python3-venv python3-virtualenv"
-    # Install enhanced Python REPL
-    run_command "pip3 install --user bpython"
-    print_success "Python tools installed"
-fi
-
-# ============================================
-# APPLY DOTFILES WITH GNU STOW
-# ============================================
-print_step "Applying dotfiles with GNU Stow..."
-
-# Create backup directory for existing files
-BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
-run_command "mkdir -p '$BACKUP_DIR'"
-
-# Backup existing .zshrc if present
-if [ -f "$HOME/.zshrc" ] && [ "$DRY_RUN" = false ]; then
-    print_warning "Backing up existing .zshrc to $BACKUP_DIR"
+# Backup existing .zshrc
+if [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ]; then
+    BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
+    mkdir -p "$BACKUP_DIR"
     mv "$HOME/.zshrc" "$BACKUP_DIR/"
-elif [ -f "$HOME/.zshrc" ]; then
-    print_warning "Would backup existing .zshrc to $BACKUP_DIR"
+    print_warning "Backed up .zshrc to $BACKUP_DIR"
 fi
 
-# Apply dotfiles using stow (creates symlinks)
-run_command "cd '$HOME/.dotfiles' && stow --adopt ."
-
-print_success "Dotfiles applied successfully"
+cd "$DOTFILES_DIR" && stow --adopt .
+print_success "Dotfiles applied"
 
 # ============================================
-# CHANGE DEFAULT SHELL
+# SET DEFAULT SHELL
 # ============================================
 if [ "$SHELL" != "$(which zsh)" ]; then
-    print_step "Changing default shell to Zsh..."
-    run_command "sudo chsh -s '$(which zsh)' '$(whoami)'"
-    print_success "Default shell changed to Zsh (restart terminal to apply)"
-else
-    print_success "Zsh is already the default shell"
+    print_step "Setting Zsh as default shell..."
+    sudo chsh -s "$(which zsh)" "$(whoami)"
+    print_success "Default shell changed to Zsh"
 fi
 
 # ============================================
-# FINAL STEPS
+# DONE
 # ============================================
 echo ""
-if [ "$DRY_RUN" = true ]; then
-    echo -e "${BLUE}================================================${NC}"
-    echo -e "${BLUE}🔍 DRY RUN COMPLETED${NC}"
-    echo -e "${BLUE}================================================${NC}"
-    echo ""
-    echo -e "${YELLOW}This was a test run. No changes were made.${NC}"
-    echo -e "To actually install, run: ${GREEN}./scripts/setup.sh${NC}"
-else
-    echo -e "${GREEN}================================================${NC}"
-    echo -e "${GREEN}✓ Setup completed successfully!${NC}"
-    echo -e "${GREEN}================================================${NC}"
-    echo ""
-    echo -e "${YELLOW}Next steps:${NC}"
-    echo -e "  1. Restart your terminal or run: ${BLUE}exec zsh${NC}"
-    echo -e "  2. Open Neovim to install plugins: ${BLUE}nvim${NC}"
-    echo -e "  3. Claude Code CLI is ready to use: ${BLUE}claude-code${NC}"
-    echo ""
-    echo -e "${YELLOW}Optional:${NC}"
-    echo -e "  - Configure Git: ${BLUE}git config --global user.name 'Your Name'${NC}"
-    echo -e "  - Configure Git: ${BLUE}git config --global user.email 'your@email.com'${NC}"
-    echo -e "  - Set up SSH key: ${BLUE}ssh-keygen -t ed25519 -C 'your@email.com'${NC}"
-fi
+echo -e "${GREEN}================================================${NC}"
+echo -e "${GREEN}✓ Setup completed!${NC}"
+echo -e "${GREEN}================================================${NC}"
+echo ""
+echo -e "${YELLOW}Next steps:${NC}"
+echo -e "  1. Restart terminal or run: ${BLUE}exec zsh${NC}"
+echo -e "  2. Open Neovim to install plugins: ${BLUE}nvim${NC}"
 echo ""

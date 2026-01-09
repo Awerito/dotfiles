@@ -1,0 +1,22 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Pre-install ALL dependencies to speed up testing
+RUN apt-get update && apt-get install -y \
+    git curl wget sudo stow build-essential xclip ripgrep fd-find fzf tree unzip 7zip htop \
+    zsh \
+    ninja-build gettext cmake \
+    software-properties-common \
+    fontconfig \
+    python3-pip python3-venv python3-virtualenv \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user with sudo
+RUN useradd -m -s /bin/bash testuser && \
+    echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+USER testuser
+WORKDIR /home/testuser
+
+CMD ["/bin/bash"]

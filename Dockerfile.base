@@ -1,0 +1,66 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV HOME=/root
+
+# ============================================
+# SYSTEM PACKAGES
+# ============================================
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+    git curl wget sudo stow build-essential xclip ripgrep fd-find fzf tree unzip 7zip htop \
+    zsh \
+    ninja-build gettext cmake \
+    software-properties-common \
+    fontconfig \
+    python3-pip python3-venv python3-virtualenv \
+    ca-certificates gnupg lsb-release \
+    && rm -rf /var/lib/apt/lists/*
+
+# ============================================
+# NEOVIM FROM SOURCE
+# ============================================
+RUN git clone --depth 1 --branch stable https://github.com/neovim/neovim.git /tmp/neovim && \
+    make -C /tmp/neovim CMAKE_BUILD_TYPE=Release && \
+    make -C /tmp/neovim install && \
+    rm -rf /tmp/neovim
+
+# ============================================
+# OH MY ZSH
+# ============================================
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+
+# ============================================
+# NVM + NODE LTS
+# ============================================
+ENV NVM_DIR=/root/.nvm
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash && \
+    . "$NVM_DIR/nvm.sh" && \
+    nvm install --lts && \
+    nvm use --lts && \
+    npm install -g @anthropic-ai/claude-code
+
+# ============================================
+# KITTY TERMINAL
+# ============================================
+RUN curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin launch=n
+
+# ============================================
+# FASTFETCH
+# ============================================
+RUN add-apt-repository ppa:zhangsongcui3371/fastfetch -y && \
+    apt-get update && \
+    apt-get install -y fastfetch && \
+    rm -rf /var/lib/apt/lists/*
+
+# ============================================
+# NERD FONTS
+# ============================================
+RUN mkdir -p /root/.local/share/fonts && \
+    wget -q https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/UbuntuMono/Regular/UbuntuMonoNerdFontMono-Regular.ttf \
+    -P /root/.local/share/fonts && \
+    fc-cache -fv
+
+# Marker file to verify image
+RUN echo "dotfiles-base-ready" > /root/.dotfiles-base-marker
+
+CMD ["/bin/zsh"]

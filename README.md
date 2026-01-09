@@ -18,13 +18,18 @@ This repository includes configurations for:
 ```
 .dotfiles/
 ├── .config/
-│   ├── nvim/          # Neovim configuration
-│   ├── kitty/         # Kitty terminal configuration
-│   ├── fastfetch/     # Fastfetch configuration
-│   └── stylua/        # Lua formatter
-├── .zshrc             # Main Zsh configuration
+│   ├── nvim/
+│   │   ├── init.lua           # Entry point
+│   │   └── lua/
+│   │       ├── config/        # Core settings (options, keymaps, autocmds)
+│   │       ├── plugins/       # Plugin specs (one file per plugin)
+│   │       └── custom/        # Custom modules (k8s-secret, etc.)
+│   ├── kitty/                 # Kitty terminal configuration
+│   ├── fastfetch/             # Fastfetch configuration
+│   └── stylua/                # Lua formatter
+├── .zshrc                     # Main Zsh configuration
 └── scripts/
-    └── setup.sh       # Automated installation script
+    └── setup.sh               # Automated installation script
 ```
 
 ## Prerequisites
@@ -121,16 +126,23 @@ v             # find and open files with fzf
 py            # python3.12
 ```
 
-### Neovim (.config/nvim/init.lua:1)
+### Neovim (.config/nvim/)
 
-Modern configuration with:
-- Integrated LSP (Language Server Protocol)
-- Treesitter for advanced syntax highlighting
-- Telescope for fuzzy navigation
-- Intelligent autocompletion
-- Git integration
-- Multi-language support
-- Enhanced vi mode with spacebar leader
+Modular configuration organized in `lua/`:
+
+| Directory | Purpose |
+|-----------|---------|
+| `config/` | Core settings: options, keymaps, autocmds, lazy bootstrap |
+| `plugins/` | One file per plugin: lsp, telescope, cmp, treesitter, etc. |
+| `custom/` | Custom modules like K8s secret decoder |
+
+**Features:**
+- LSP with Mason (auto-install language servers)
+- Treesitter for syntax highlighting
+- Telescope for fuzzy navigation (respects .gitignore)
+- Autocompletion with nvim-cmp
+- Format on save with conform.nvim
+- Claude Code integration
 
 ### Kitty Terminal (.config/kitty/kitty.conf)
 
@@ -191,8 +203,10 @@ All configurations are in separate files for easy editing:
 # Edit Zsh
 nvim ~/.zshrc
 
-# Edit Neovim
-nvim ~/.config/nvim/init.lua
+# Edit Neovim (modular structure)
+nvim ~/.config/nvim/lua/config/options.lua   # General settings
+nvim ~/.config/nvim/lua/config/keymaps.lua   # Key mappings
+nvim ~/.config/nvim/lua/plugins/             # Plugin configs
 
 # Edit Kitty
 nvim ~/.config/kitty/kitty.conf

@@ -1,0 +1,15 @@
+services:
+  gitsync:
+    build: .
+    container_name: gitsync
+    ports:
+      - "2222:22"
+    volumes:
+      - gitsync-data:/home/gitsync/Git
+    environment:
+      - SSH_KEY_PC=${SSH_KEY_PC}
+      - SSH_KEY_LAPTOP=${SSH_KEY_LAPTOP}
+    restart: unless-stopped
+
+volumes:
+  gitsync-data:

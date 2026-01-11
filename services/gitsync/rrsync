@@ -1,0 +1,28 @@
+#!/bin/bash
+# Restricted rsync - only allows rsync to specified directory
+
+BASEDIR="$1"
+
+if [ -z "$BASEDIR" ]; then
+    echo "Usage: rrsync <basedir>" >&2
+    exit 1
+fi
+
+# Validate SSH_ORIGINAL_COMMAND
+if [ -z "$SSH_ORIGINAL_COMMAND" ]; then
+    echo "No command provided" >&2
+    exit 1
+fi
+
+# Only allow rsync commands
+case "$SSH_ORIGINAL_COMMAND" in
+    rsync\ --server*)
+        # Execute rsync with the base directory
+        cd "$BASEDIR" || exit 1
+        exec $SSH_ORIGINAL_COMMAND
+        ;;
+    *)
+        echo "Command not allowed" >&2
+        exit 1
+        ;;
+esac

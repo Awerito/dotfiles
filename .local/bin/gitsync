@@ -1,0 +1,135 @@
+#!/bin/bash
+
+# ============================================
+# GitSync - Secure repo sync via SSH
+# ============================================
+
+# Colors
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+# Load config
+CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/gitsync/config"
+
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo -e "${RED}✗ Config not found: $CONFIG_FILE${NC}"
+    echo "Create it with:"
+    echo "  mkdir -p ~/.config/gitsync"
+    echo "  echo 'SERVER=your.server.com' >> ~/.config/gitsync/config"
+    echo "  echo 'PORT=2222' >> ~/.config/gitsync/config"
+    echo "  echo 'LOCAL_PATH=\$HOME/Git' >> ~/.config/gitsync/config"
+    exit 1
+fi
+
+source "$CONFIG_FILE"
+
+# Validate required config
+if [ -z "$SERVER" ] || [ -z "$PORT" ] || [ -z "$LOCAL_PATH" ]; then
+    echo -e "${RED}✗ Missing config. Required: SERVER, PORT, LOCAL_PATH${NC}"
+    exit 1
+fi
+
+# Folders to exclude
+EXCLUDES=(
+    node_modules
+    venv
+    env
+    .venv
+    __pycache__
+    '*.pyc'
+    target
+    dist
+    build
+    .next
+    .nuxt
+    .cache
+    .tox
+    .eggs
+    '*.egg-info'
+    .mypy_cache
+    .pytest_cache
+    coverage
+    .coverage
+    htmlcov
+)
+
+# Build exclude arguments
+EXCLUDE_ARGS=""
+for pattern in "${EXCLUDES[@]}"; do
+    EXCLUDE_ARGS="$EXCLUDE_ARGS --exclude=$pattern"
+done
+
+# SSH command with timeout
+SSH_CMD="ssh -p $PORT -o ConnectTimeout=10"
+
+# Ensure local path exists
+mkdir -p "$LOCAL_PATH"
+
+run_rsync() {
+    local output
+    local exit_code
+    output=$("$@" 2>&1)
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo -e "${RED}✗ Error (exit code $exit_code):${NC}"
+        echo "$output"
+        exit $exit_code
+    fi
+    echo "$output"
+    return 0
+}
+
+case "$1" in
+    down|pull)
+        echo -e "${BLUE}Pulling from server...${NC}"
+        run_rsync rsync -avz --progress --delete $EXCLUDE_ARGS \
+            -e "$SSH_CMD" \
+            "gitsync@$SERVER:." "$LOCAL_PATH/"
+        echo -e "${GREEN}✓ Sync complete${NC}"
+        ;;
+    up|push)
+        echo -e "${BLUE}Pushing to server...${NC}"
+        run_rsync rsync -avz --progress --delete $EXCLUDE_ARGS \
+            -e "$SSH_CMD" \
+            "$LOCAL_PATH/" "gitsync@$SERVER:."
+        echo -e "${GREEN}✓ Sync complete${NC}"
+        ;;
+    status)
+        echo -e "${BLUE}[DRY-RUN] Comparing local vs server (no changes will be made)...${NC}"
+        output=$(rsync -avzn --delete $EXCLUDE_ARGS \
+            -e "$SSH_CMD" \
+            "$LOCAL_PATH/" "gitsync@$SERVER:." 2>&1)
+        exit_code=$?
+        # Code 23 = partial transfer (some files skipped) - treat as warning
+        if [ $exit_code -ne 0 ] && [ $exit_code -ne 23 ]; then
+            echo -e "${RED}✗ Connection failed (exit code $exit_code):${NC}"
+            echo "$output"
+            exit $exit_code
+        fi
+        echo -e "${GREEN}✓ Connected to $SERVER:$PORT${NC}"
+        changes=$(echo "$output" | grep -v '^\./$' | grep -v '^$' | grep -v '^sending\|^sent\|^total\|^rsync error')
+        if [ -z "$changes" ]; then
+            echo -e "${GREEN}✓ No differences found.${NC}"
+        else
+            echo "$changes"
+            count=$(echo "$changes" | wc -l)
+            echo -e "${YELLOW}$count file(s) would change if you run 'gitsync up'${NC}"
+        fi
+        if [ $exit_code -eq 23 ]; then
+            echo -e "${YELLOW}⚠ Warning: some files were skipped:${NC}"
+            echo "$output" | grep -E '^rsync:|permission denied|vanished|failed' | head -10
+        fi
+        echo -e "${BLUE}[DRY-RUN] No changes were made.${NC}"
+        ;;
+    *)
+        echo "Usage: gitsync [down|up|status]"
+        echo ""
+        echo -e "  ${GREEN}down${NC}    Pull from server to local"
+        echo -e "  ${GREEN}up${NC}      Push from local to server"
+        echo -e "  ${GREEN}status${NC}  Show differences (dry-run)"
+        exit 1
+        ;;
+esac

@@ -9,8 +9,8 @@ RUN adduser -D -s /bin/bash gitsync && \
     chown -R gitsync:gitsync /home/gitsync
 
 # SSH config: only allow gitsync user, no password auth
+# Host keys are generated at runtime and persisted in volume
 RUN mkdir -p /etc/ssh && \
-    ssh-keygen -A && \
     echo "PermitRootLogin no" >> /etc/ssh/sshd_config && \
     echo "PasswordAuthentication no" >> /etc/ssh/sshd_config && \
     echo "AllowUsers gitsync" >> /etc/ssh/sshd_config && \

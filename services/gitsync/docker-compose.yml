@@ -6,6 +6,7 @@ services:
       - "2222:22"
     volumes:
       - gitsync-data:/home/gitsync/Git
+      - gitsync-ssh-keys:/etc/ssh/keys
     environment:
       - SSH_KEY_PC=${SSH_KEY_PC}
       - SSH_KEY_LAPTOP=${SSH_KEY_LAPTOP}
@@ -13,3 +14,4 @@ services:
 
 volumes:
   gitsync-data:
+  gitsync-ssh-keys:

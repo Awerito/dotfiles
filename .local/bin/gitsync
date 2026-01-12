@@ -32,9 +32,6 @@ if [ -z "$SERVER" ] || [ -z "$PORT" ] || [ -z "$LOCAL_PATH" ]; then
     exit 1
 fi
 
-# Use .gitignore from each repo
-EXCLUDE_ARGS="--filter=':- .gitignore'"
-
 # SSH command with timeout
 SSH_CMD="ssh -p $PORT -o ConnectTimeout=10"
 
@@ -67,21 +64,21 @@ case "$1" in
         fi
         echo -e "${GREEN}✓ Server has $file_count files. Proceeding...${NC}"
         echo -e "${BLUE}Pulling from server...${NC}"
-        run_rsync rsync -avz --progress --delete $EXCLUDE_ARGS \
+        run_rsync rsync -avz --progress --delete --filter=':- .gitignore' \
             -e "$SSH_CMD" \
             "gitsync@$SERVER:." "$LOCAL_PATH/"
         echo -e "${GREEN}✓ Sync complete${NC}"
         ;;
     up|push)
         echo -e "${BLUE}Pushing to server...${NC}"
-        run_rsync rsync -avz --progress --delete $EXCLUDE_ARGS \
+        run_rsync rsync -avz --progress --delete --filter=':- .gitignore' \
             -e "$SSH_CMD" \
             "$LOCAL_PATH/" "gitsync@$SERVER:."
         echo -e "${GREEN}✓ Sync complete${NC}"
         ;;
     status)
         echo -e "${BLUE}[DRY-RUN] Comparing local vs server (no changes will be made)...${NC}"
-        output=$(rsync -avzn --delete $EXCLUDE_ARGS \
+        output=$(rsync -avzn --delete --filter=':- .gitignore' \
             -e "$SSH_CMD" \
             "$LOCAL_PATH/" "gitsync@$SERVER:." 2>&1)
         exit_code=$?

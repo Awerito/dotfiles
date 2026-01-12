@@ -1,6 +1,20 @@
 #!/bin/bash
 set -e
 
+# Generate SSH host keys if they don't exist (persisted in volume)
+SSH_KEY_DIR="/etc/ssh/keys"
+mkdir -p "$SSH_KEY_DIR"
+if [ ! -f "$SSH_KEY_DIR/ssh_host_ed25519_key" ]; then
+    echo "Generating SSH host keys..."
+    ssh-keygen -t ed25519 -f "$SSH_KEY_DIR/ssh_host_ed25519_key" -N ""
+    ssh-keygen -t rsa -b 4096 -f "$SSH_KEY_DIR/ssh_host_rsa_key" -N ""
+fi
+# Symlink keys to expected location
+ln -sf "$SSH_KEY_DIR/ssh_host_ed25519_key" /etc/ssh/ssh_host_ed25519_key
+ln -sf "$SSH_KEY_DIR/ssh_host_ed25519_key.pub" /etc/ssh/ssh_host_ed25519_key.pub
+ln -sf "$SSH_KEY_DIR/ssh_host_rsa_key" /etc/ssh/ssh_host_rsa_key
+ln -sf "$SSH_KEY_DIR/ssh_host_rsa_key.pub" /etc/ssh/ssh_host_rsa_key.pub
+
 AUTH_KEYS="/home/gitsync/.ssh/authorized_keys"
 
 # Clear and recreate authorized_keys

@@ -32,35 +32,8 @@ if [ -z "$SERVER" ] || [ -z "$PORT" ] || [ -z "$LOCAL_PATH" ]; then
     exit 1
 fi
 
-# Folders to exclude
-EXCLUDES=(
-    node_modules
-    venv
-    env
-    .venv
-    __pycache__
-    '*.pyc'
-    target
-    dist
-    build
-    .next
-    .nuxt
-    .cache
-    .tox
-    .eggs
-    '*.egg-info'
-    .mypy_cache
-    .pytest_cache
-    coverage
-    .coverage
-    htmlcov
-)
-
-# Build exclude arguments
-EXCLUDE_ARGS=""
-for pattern in "${EXCLUDES[@]}"; do
-    EXCLUDE_ARGS="$EXCLUDE_ARGS --exclude=$pattern"
-done
+# Use .gitignore from each repo
+EXCLUDE_ARGS="--filter=':- .gitignore'"
 
 # SSH command with timeout
 SSH_CMD="ssh -p $PORT -o ConnectTimeout=10"
@@ -84,6 +57,15 @@ run_rsync() {
 
 case "$1" in
     down|pull)
+        echo -e "${BLUE}Checking server before pull...${NC}"
+        file_count=$(rsync -n --stats -e "$SSH_CMD" "gitsync@$SERVER:." 2>/dev/null | grep "Number of files" | head -1 | grep -oE '[0-9,]+' | tr -d ',')
+        if [ -z "$file_count" ] || [ "$file_count" -lt 10 ]; then
+            echo -e "${RED}✗ Server appears empty or has very few files ($file_count).${NC}"
+            echo -e "${RED}  Refusing to pull to avoid deleting your local ~/Git.${NC}"
+            echo -e "${YELLOW}  If this is intentional, remove this check or use rsync manually.${NC}"
+            exit 1
+        fi
+        echo -e "${GREEN}✓ Server has $file_count files. Proceeding...${NC}"
         echo -e "${BLUE}Pulling from server...${NC}"
         run_rsync rsync -avz --progress --delete $EXCLUDE_ARGS \
             -e "$SSH_CMD" \

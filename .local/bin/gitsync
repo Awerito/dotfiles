@@ -52,6 +52,14 @@ run_rsync() {
     return 0
 }
 
+# Parse depth for status command
+DEPTH=1
+for arg in "$@"; do
+    case "$arg" in
+        --depth=*) DEPTH="${arg#*=}" ;;
+    esac
+done
+
 case "$1" in
     down|pull)
         echo -e "${BLUE}Checking server before pull...${NC}"
@@ -77,8 +85,8 @@ case "$1" in
         echo -e "${GREEN}✓ Sync complete${NC}"
         ;;
     status)
-        echo -e "${BLUE}[DRY-RUN] Comparing local vs server (no changes will be made)...${NC}"
-        output=$(rsync -avzn --delete --filter=':- .gitignore' \
+        echo -e "${BLUE}[DRY-RUN] Comparing local vs server...${NC}"
+        output=$(rsync -rin --delete --filter=':- .gitignore' \
             -e "$SSH_CMD" \
             "$LOCAL_PATH/" "gitsync@$SERVER:." 2>&1)
         exit_code=$?
@@ -89,26 +97,114 @@ case "$1" in
             exit $exit_code
         fi
         echo -e "${GREEN}✓ Connected to $SERVER:$PORT${NC}"
-        changes=$(echo "$output" | grep -v '^\./$' | grep -v '^$' | grep -v '^sending\|^sent\|^total\|^rsync error')
-        if [ -z "$changes" ]; then
+
+        # Parse rsync itemize output and group by directory
+        declare -A added modified deleted
+        total_added=0
+        total_modified=0
+        total_deleted=0
+
+        while IFS= read -r line; do
+            [[ -z "$line" ]] && continue
+            # rsync -i format: YXcstpoguax path
+            # Y: update type (< sent, > received, c local change, h hard link, . no update, * message)
+            # X: file type (f file, d directory, L symlink, etc)
+            flags="${line:0:11}"
+            path="${line:12}"
+
+            # Skip empty paths and root
+            [[ -z "$path" || "$path" == "./" ]] && continue
+
+            # Determine change type
+            change_type=""
+            if [[ "$line" == *deleting* ]]; then
+                change_type="deleted"
+            elif [[ "${flags:0:1}" == ">" || "${flags:0:1}" == "c" ]]; then
+                # Check if it's a new file (all flags set) or modification
+                if [[ "${flags:2:1}" == "+" ]]; then
+                    change_type="added"
+                else
+                    change_type="modified"
+                fi
+            elif [[ "${flags:0:1}" == "<" ]]; then
+                change_type="modified"
+            fi
+
+            [[ -z "$change_type" ]] && continue
+
+            # Skip directories themselves, only count files
+            [[ "$path" == */ ]] && continue
+
+            # Get directory at specified depth
+            dir=$(echo "$path" | cut -d'/' -f1-"$DEPTH")
+            # If the path has more components than depth, add trailing /
+            if [[ $(echo "$path" | tr -cd '/' | wc -c) -ge $DEPTH ]]; then
+                dir="$dir/"
+            fi
+
+            # Count by type and directory
+            case "$change_type" in
+                added)
+                    ((added["$dir"]++))
+                    ((total_added++))
+                    ;;
+                modified)
+                    ((modified["$dir"]++))
+                    ((total_modified++))
+                    ;;
+                deleted)
+                    ((deleted["$dir"]++))
+                    ((total_deleted++))
+                    ;;
+            esac
+        done <<< "$output"
+
+        total=$((total_added + total_modified + total_deleted))
+
+        if [ $total -eq 0 ]; then
             echo -e "${GREEN}✓ No differences found.${NC}"
         else
-            echo "$changes"
-            count=$(echo "$changes" | wc -l)
-            echo -e "${YELLOW}$count file(s) would change if you run 'gitsync up'${NC}"
+            echo ""
+            # Collect all unique directories
+            declare -A all_dirs
+            for dir in "${!added[@]}"; do all_dirs["$dir"]=1; done
+            for dir in "${!modified[@]}"; do all_dirs["$dir"]=1; done
+            for dir in "${!deleted[@]}"; do all_dirs["$dir"]=1; done
+
+            # Print grouped by directory
+            for dir in $(echo "${!all_dirs[@]}" | tr ' ' '\n' | sort); do
+                a=${added["$dir"]:-0}
+                m=${modified["$dir"]:-0}
+                d=${deleted["$dir"]:-0}
+
+                # Build change indicator
+                indicator=""
+                [[ $a -gt 0 ]] && indicator="${indicator}${GREEN}+$a${NC} "
+                [[ $m -gt 0 ]] && indicator="${indicator}${YELLOW}~$m${NC} "
+                [[ $d -gt 0 ]] && indicator="${indicator}${RED}-$d${NC} "
+
+                printf "  %-40s %s\n" "$dir" "$indicator"
+            done
+
+            echo ""
+            echo -e "Summary: ${GREEN}+$total_added${NC} ${YELLOW}~$total_modified${NC} ${RED}-$total_deleted${NC} ($total files)"
+            echo -e "${YELLOW}Run 'gitsync up' to push these changes${NC}"
         fi
+
         if [ $exit_code -eq 23 ]; then
             echo -e "${YELLOW}⚠ Warning: some files were skipped:${NC}"
             echo "$output" | grep -E '^rsync:|permission denied|vanished|failed' | head -10
         fi
-        echo -e "${BLUE}[DRY-RUN] No changes were made.${NC}"
         ;;
     *)
-        echo "Usage: gitsync [down|up|status]"
+        echo "Usage: gitsync [down|up|status] [options]"
         echo ""
         echo -e "  ${GREEN}down${NC}    Pull from server to local"
         echo -e "  ${GREEN}up${NC}      Push from local to server"
         echo -e "  ${GREEN}status${NC}  Show differences (dry-run)"
+        echo ""
+        echo "Options:"
+        echo "  --depth=N   Directory depth for status grouping (default: 1)"
         exit 1
         ;;
 esac

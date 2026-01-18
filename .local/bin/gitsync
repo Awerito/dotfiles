@@ -183,7 +183,7 @@ case "$1" in
                 [[ $m -gt 0 ]] && indicator="${indicator}${YELLOW}~$m${NC} "
                 [[ $d -gt 0 ]] && indicator="${indicator}${RED}-$d${NC} "
 
-                printf "  %-40s %s\n" "$dir" "$indicator"
+                printf "  %-40s %b\n" "$dir" "$indicator"
             done
 
             echo ""

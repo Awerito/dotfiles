@@ -156,3 +156,6 @@ fpath+=~/.zfunc
 autoload -Uz compinit
 compinit
 zstyle ':completion:*' menu select
+
+# opencode
+export PATH=/home/awe/.opencode/bin:$PATH

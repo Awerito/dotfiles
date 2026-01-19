@@ -7,6 +7,12 @@ return {
         ft = { "markdown" },
     },
 
+    -- Terreno - codebase visualization (local dev)
+    {
+        "Awerito/terreno.nvim",
+        build = ":call terreno#util#install()",
+    },
+
     -- Detect tabstop and shiftwidth automatically
     "tpope/vim-sleuth",
 

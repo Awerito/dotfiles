@@ -78,6 +78,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/Awerito/dotfiles/master/
 - **ripgrep, fzf, fd**: Fast file and content search
 - **xclip**: System clipboard integration
 - **tree, htop**: Visualization utilities
+- **devilspie2**: Windows watching
 
 ### Development Environment
 - **Zsh** + **Oh My Zsh**: Modern shell with framework

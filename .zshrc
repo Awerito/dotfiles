@@ -107,6 +107,7 @@ alias gd='git difftool --tool=nvimdiff -y'
 alias gc='git checkout'
 alias gl='git log --decorate --all --graph --pretty=format:"%C(auto)%h%d %s %C(blue)%cr %C(green)%an"'
 alias glb='git log --decorate --all --graph --pretty=format:"%C(auto)%h%d %s %C(blue)%cr %C(green)%an%n%b"'
+alias mit='lice mit -o Awerito > LICENSE'
 
 # ============================================
 # ALIASES - DEVELOPMENT

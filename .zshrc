@@ -136,10 +136,16 @@ alias dps='docker ps --format=$DOCKER_FORMAT'
 # ============================================
 export PATH=$PATH:$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin:$HOME/.local/scripts
 
-# NVM
+# NVM (compatible con instalación manual y pacman)
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ ! -d "$NVM_DIR" ] && mkdir -p "$NVM_DIR"
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+  \. "$NVM_DIR/nvm.sh"
+elif [ -s "/usr/share/nvm/nvm.sh" ]; then
+  \. "/usr/share/nvm/nvm.sh"
+fi
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+[ -s "/usr/share/nvm/bash_completion" ] && \. "/usr/share/nvm/bash_completion"
 
 # LaTeX
 export PATH="$PATH:/usr/local/texlive/2024/bin/x86_64-linux"

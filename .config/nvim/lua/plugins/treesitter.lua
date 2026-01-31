@@ -21,5 +21,12 @@ return {
         if #to_install > 0 then
             require("nvim-treesitter").install(to_install)
         end
+
+        vim.api.nvim_create_autocmd("FileType", {
+            pattern = parsers,
+            callback = function()
+                vim.treesitter.start()
+            end,
+        })
     end,
 }

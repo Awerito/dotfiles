@@ -3,10 +3,15 @@ return {
     build = ":TSUpdate",
     config = function()
         local parsers = {
+            "bash",
             "c",
+            "diff",
             "html",
             "lua",
+            "luadoc",
             "markdown",
+            "markdown_inline",
+            "query",
             "vimdoc",
             "python",
             "javascript",

@@ -14,3 +14,5 @@ cat > "$CONFIG" << EOF
     sampling_method: Alphanumeric,
 )
 EOF
+
+notify-send "Wallpaper changed" "$(basename "$IMAGE")"

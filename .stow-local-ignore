@@ -22,7 +22,7 @@ _darcs
 ^/LICENSE.*
 ^/COPYING
 
-scripts
+^/scripts
 services
 .config/nvim/lazy-lock.json
 Dockerfile.test

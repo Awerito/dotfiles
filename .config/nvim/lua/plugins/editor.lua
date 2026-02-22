@@ -10,7 +10,7 @@ return {
     -- Terreno - codebase visualization (local dev)
     {
         "Awerito/terreno.nvim",
-        build = ":call terreno#util#install()",
+        build = "cd app && bash install.sh",
     },
 
     -- Detect tabstop and shiftwidth automatically

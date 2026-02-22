@@ -118,7 +118,7 @@ alias vimdiff='nvim -d'
 alias clayton='bpython'
 alias py='python3.12'
 alias venv="virtualenv env"
-alias so="source env/bin/activate && clear"
+alias so="source .venv/bin/activate && clear"
 alias v="find . \( -path ./node_modules -o -path ./.git -o -path ./env -o -name '*.pyc' \) -prune -o -type f -print | fzf --reverse | xargs -o nvim"
 
 # ============================================
@@ -131,6 +131,8 @@ alias md2pdf='f=$(ls *.md); pandoc -t beamer --pdf-engine=xelatex "$f" -o "${f%.
 
 DOCKER_FORMAT="\nID\t{{.ID}}\nIMAGE\t{{.Image}}\nCOMMAND\t{{.Command}}\nCREATED\t{{.RunningFor}}\nSTATUS\t{{.Status}}\nPORTS\t{{.Ports}}\nNAMES\t{{.Names}}\n"
 alias dps='docker ps --format=$DOCKER_FORMAT'
+alias jeliup='cd ~/.config/jellyfin && docker compose up -d && cd -'
+alias jelidown='cd ~/.config/jellyfin && docker compose down && cd -'
 
 # ============================================
 # PATH & EXTERNAL TOOLS

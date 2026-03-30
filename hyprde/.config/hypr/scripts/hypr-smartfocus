@@ -1,0 +1,31 @@
+#!/bin/bash
+# Smart focus: move focus within workspace, or switch desktop at edges
+# Usage: hypr-smartfocus <l|r>
+
+DIR="$1"
+WIN=$(hyprctl activewindow -j)
+WS_ID=$(hyprctl activeworkspace -j | jq '.id')
+
+# No windows or no active window → just switch workspace
+if [ -z "$WIN" ] || [ "$WIN" = "{}" ] || echo "$WIN" | jq -e '.address == "0x0"' >/dev/null 2>&1; then
+    case "$DIR" in
+        l) [ "$WS_ID" -gt 1 ] && hyprctl dispatch workspace -1 ;;
+        r) [ "$WS_ID" -lt 5 ] && hyprctl dispatch workspace +1 ;;
+    esac
+    exit 0
+fi
+
+WIN_X=$(echo "$WIN" | jq '.at[0]')
+
+# Get all windows in current workspace sorted by X position
+CLIENTS=$(hyprctl clients -j | jq -r "[.[] | select(.workspace.id == $WS_ID)] | sort_by(.at[0])")
+LEFTMOST=$(echo "$CLIENTS" | jq '.[0].at[0]')
+RIGHTMOST=$(echo "$CLIENTS" | jq '.[-1].at[0]')
+
+if [ "$DIR" = "l" ] && [ "$WIN_X" = "$LEFTMOST" ]; then
+    [ "$WS_ID" -gt 1 ] && hyprctl dispatch workspace -1
+elif [ "$DIR" = "r" ] && [ "$WIN_X" = "$RIGHTMOST" ]; then
+    [ "$WS_ID" -lt 5 ] && hyprctl dispatch workspace +1
+else
+    hyprctl dispatch movefocus "$DIR"
+fi

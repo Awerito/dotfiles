@@ -19,9 +19,10 @@ if [ "$DIR" = "l" ] || [ "$DIR" = "r" ]; then
     NEW_Y=$(echo "$NEW_INFO" | jq '.at[1]')
 
     if [ "$POS_X" = "$NEW_X" ] && [ "$POS_Y" = "$NEW_Y" ]; then
+        WS_ID=$(hyprctl activewindow -j | jq '.workspace.id')
         case "$DIR" in
-            l) hyprctl dispatch movetoworkspace -1 ;;
-            r) hyprctl dispatch movetoworkspace +1 ;;
+            l) [ "$WS_ID" -gt 1 ] && hyprctl dispatch movetoworkspace -1 ;;
+            r) [ "$WS_ID" -lt 5 ] && hyprctl dispatch movetoworkspace +1 ;;
         esac
     fi
 fi

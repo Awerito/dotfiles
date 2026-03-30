@@ -1,0 +1,27 @@
+#!/bin/bash
+# Screenshot tool: area (with freeze), window, or fullscreen
+# Usage: hypr-screenshot <area|window|full>
+
+MODE="$1"
+DIR="$HOME/Pictures/Screenshots"
+mkdir -p "$DIR"
+FILE="$DIR/$(date +%Y%m%d_%H%M%S).png"
+
+case "$MODE" in
+    area)
+        hyprpicker -rzd &
+        PICKER_PID=$!
+        sleep 0.2
+        REGION=$(slurp)
+        if [ -n "$REGION" ]; then
+            grim -g "$REGION" - | tee "$FILE" | wl-copy
+        fi
+        kill $PICKER_PID 2>/dev/null
+        ;;
+    window)
+        grimblast copysave active "$FILE"
+        ;;
+    full)
+        grimblast copysave output "$FILE"
+        ;;
+esac

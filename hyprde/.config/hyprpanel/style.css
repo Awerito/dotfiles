@@ -1,0 +1,116 @@
+* {
+    font-family: "MesloLGS Nerd Font", monospace;
+    font-size: 13px;
+}
+
+#panel {
+    background-color: rgba(24, 24, 37, 0.92);
+    color: #cdd6f4;
+}
+
+#panel.top {
+    border-bottom: 2px solid rgba(212, 160, 185, 0.25);
+}
+
+.module {
+    color: #cdd6f4;
+}
+
+#pager .workspace {
+    background-color: rgba(49, 50, 68, 0.6);
+    border: 1px solid transparent;
+    border-radius: 6px;
+}
+
+#pager .workspace.active {
+    background-color: rgba(212, 160, 185, 0.2);
+    border: 1px solid rgba(212, 160, 185, 0.4);
+}
+
+#pager .workspace .client.active {
+    border-color: #d4a0b9;
+}
+
+#taskbar .client {
+    border-radius: 6px;
+}
+
+#taskbar .client.active {
+    background-color: rgba(212, 160, 185, 0.15);
+}
+
+#taskbar .indicator {
+    background-color: #d4a0b9;
+}
+
+#clock #clockTime {
+    color: #cdd6f4;
+    font-weight: bold;
+}
+
+#clock #clockDate {
+    color: #a6adc8;
+}
+
+#audio .overlay {
+    background-color: rgba(212, 160, 185, 0.8);
+    border-radius: 4px;
+}
+
+.notification {
+    background-color: rgba(30, 30, 46, 0.95);
+    color: #cdd6f4;
+    border: 1px solid rgba(212, 160, 185, 0.3);
+    border-radius: 10px;
+}
+
+.notification .notificationSummary {
+    color: #d4a0b9;
+    font-weight: bold;
+}
+
+.notification button {
+    background-color: rgba(212, 160, 185, 0.2);
+    color: #cdd6f4;
+    border-radius: 6px;
+}
+
+.notification button:hover {
+    background-color: rgba(212, 160, 185, 0.35);
+}
+
+.hudNotification {
+    background-color: rgba(30, 30, 46, 0.9);
+    border: 1px solid rgba(212, 160, 185, 0.3);
+    border-radius: 10px;
+}
+
+.hudNotification .hudPercent {
+    color: #d4a0b9;
+}
+
+#sessionOverlay {
+    background-color: rgba(17, 17, 27, 0.85);
+}
+
+#sessionOverlay button {
+    background-color: rgba(49, 50, 68, 0.8);
+    color: #cdd6f4;
+    border: 1px solid rgba(212, 160, 185, 0.3);
+    border-radius: 10px;
+}
+
+#sessionOverlay button:hover {
+    background-color: rgba(212, 160, 185, 0.2);
+    border-color: #d4a0b9;
+}
+
+scale trough {
+    background-color: #313244;
+    border-radius: 4px;
+}
+
+scale highlight {
+    background-color: #d4a0b9;
+    border-radius: 4px;
+}

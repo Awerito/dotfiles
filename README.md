@@ -1,324 +1,126 @@
 # Dotfiles
 
-Personal configurations for a modern Linux development environment (Ubuntu/Debian).
+Personal configurations for a CachyOS (Arch-based) development environment.
 
 ## Contents
 
 This repository includes configurations for:
 
-- **Zsh** + Oh My Zsh with autosuggestions and syntax highlighting plugins
+- **Hyprland DE** (hyprde stow package) - Full desktop environment on Wayland
 - **Neovim** with modern configuration (LSP, Treesitter, Telescope, etc.)
 - **Kitty** terminal emulator
+- **Zsh** + Oh My Zsh with autosuggestions and syntax highlighting
 - **Fastfetch** for system information
-- **Git** aliases and useful configurations
 - Custom shell scripts and functions
 
-## Overview
+## Desktop Environment (hyprde)
+
+Minimal Wayland DE built on Hyprland, designed to replicate COSMIC tiling behavior.
+
+### Stack
+
+| Component | Tool |
+|-----------|------|
+| Compositor | Hyprland (Dwindle BSP auto-tile) |
+| Bar/Panel | HyprPanel (AGS) |
+| Wallpaper | swww (awww) |
+| Clipboard | cliphist + wl-clip-persist |
+| Screenshots | grim + slurp |
+| Calendar | gsimplecal |
+| Lock screen | swaylock |
+| File manager | Thunar + Yazi |
+| Polkit | polkit-gnome |
+
+### Key bindings
+
+| Binding | Action |
+|---------|--------|
+| Super (tap) | App launcher (wofi) |
+| Super + Enter | Kitty terminal |
+| Super + Q | Close window |
+| Super + F | Fullscreen |
+| Super + M | Toggle float/tile |
+| Super + HJKL | Focus between windows |
+| Ctrl + Super + H/L | Switch desktop left/right |
+| Shift + Super + HJKL | Move/swap window (cross-desktop at edges) |
+| Print | Screenshot (area select) |
+| Super + Print | Screenshot (focused window) |
+
+### Stow structure
 
 ```
-.dotfiles/
-├── .config/
-│   ├── nvim/
-│   │   ├── init.lua           # Entry point
-│   │   └── lua/
-│   │       ├── config/        # Core settings (options, keymaps, autocmds)
-│   │       ├── plugins/       # Plugin specs (one file per plugin)
-│   │       └── custom/        # Custom modules (k8s-secret, etc.)
-│   ├── kitty/                 # Kitty terminal configuration
-│   ├── fastfetch/             # Fastfetch configuration
-│   └── stylua/                # Lua formatter
-├── .zshrc                     # Main Zsh configuration
-└── scripts/
-    └── setup.sh               # Automated installation script
+hyprde/
+└── .config/
+    ├── hypr/
+    │   ├── hyprland.conf
+    │   ├── hyprkool.toml
+    │   └── scripts/
+    │       ├── hypr-grid
+    │       ├── hypr-movewindow
+    │       └── set-wallpaper
+    ├── hyprpanel/
+    │   ├── config.json
+    │   └── modules.json
+    └── yazi/
+        ├── keymap.toml
+        └── init.lua
 ```
 
-## Prerequisites
+### Theme
 
-- Ubuntu/Debian-based operating system (Ubuntu, Pop!_OS, Linux Mint, etc.)
-- `sudo` access
-- Internet connection
-- Git installed (automatically installed if not present)
+- Gruvbox dark color scheme
+- Accent: desaturated pink (#d4a0b9)
+- Font: MesloLGS Nerd Font Mono 13px
+- Bar: HyprPanel with 85% opacity
 
-## Quick Installation
+### Yazi shortcuts
 
-### Option 1: Clone and run
+| Key | Action |
+|-----|--------|
+| W | Set hovered image as wallpaper |
 
-```bash
-# Clone the repository to ~/.dotfiles
-git clone https://github.com/Awerito/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
-
-# Run setup
-./scripts/setup.sh
-```
-
-### Option 2: Test before installing (Dry Run)
-
-To see what the script would do without making any real changes:
-
-```bash
-./scripts/setup.sh --dry-run
-# or also:
-./scripts/setup.sh --test
-```
-
-### Option 3: One-liner from GitHub/GitLab
-
-First update the repo URL in `scripts/install.sh`, then:
-
-```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/Awerito/dotfiles/master/scripts/install.sh)"
-```
-
-## What the Script Installs
-
-### Essential Tools
-- **Git, curl, wget**: Basic tools
-- **GNU Stow**: To manage dotfiles symlinks
-- **ripgrep, fzf, fd**: Fast file and content search
-- **xclip**: System clipboard integration
-- **tree, htop**: Visualization utilities
-- **devilspie2**: Windows watching
-
-### Development Environment
-- **Zsh** + **Oh My Zsh**: Modern shell with framework
-  - Plugin: zsh-autosuggestions
-  - Plugin: zsh-syntax-highlighting
-- **Neovim** (latest version): Advanced text editor
-- **NVM** + **Node.js LTS**: Node version manager
-- **Claude Code CLI**: AI-powered code assistant
-
-### Terminal and UI
-- **Kitty**: Fast and modern terminal emulator
-- **Fastfetch**: Stylish system information
-- **Nerd Fonts**: Icon fonts for terminal (Ubuntu Mono)
-
-### Python (optional)
-- pip, venv, virtualenv
-- bpython: Enhanced interactive REPL
-
-## Main Features
-
-### Zsh (.zshrc:1)
-
-**Custom functions:**
-- `ex <file>`: Extract any type of compressed file (.zshrc:38)
-- `repos`: Fuzzy Git repository browser with onefetch (.zshrc:62)
-- `ytd`: Download YouTube videos from clipboard (.zshrc:66)
-- `gi <languages>`: Generate .gitignore files from toptal.com (.zshrc:70)
-
-**Useful aliases:**
-```bash
-# System
-update        # Update system packages
-clean         # Clean unused packages
-l, ll, la     # Enhanced file listings
-
-# Git (.zshrc:87)
-gs            # git status
-gd            # git diff with nvimdiff
-gl            # git log with pretty format
-glb           # git log with commit body
-
-# Development (.zshrc:96)
-e             # open nvim
-vimrc         # edit nvim configuration
-v             # find and open files with fzf
-py            # python3.12
-```
+## Other configurations
 
 ### Neovim (.config/nvim/)
 
-Modular configuration organized in `lua/`:
+Modular configuration with LSP, Treesitter, Telescope, autocompletion, and format on save.
 
-| Directory | Purpose |
-|-----------|---------|
-| `config/` | Core settings: options, keymaps, autocmds, lazy bootstrap |
-| `plugins/` | One file per plugin: lsp, telescope, cmp, treesitter, etc. |
-| `custom/` | Custom modules like K8s secret decoder |
+### Kitty (.config/kitty/)
 
-**Features:**
-- LSP with Mason (auto-install language servers)
-- Treesitter for syntax highlighting
-- Telescope for fuzzy navigation (respects .gitignore)
-- Autocompletion with nvim-cmp
-- Format on save with conform.nvim
-- Claude Code integration
+Performance-optimized with ligatures and Nerd Font support.
 
-### Kitty Terminal (.config/kitty/kitty.conf)
+### Zsh (.zshrc)
 
-- Performance-optimized configuration
-- Typographic ligatures support
-- Custom themes
-- Intuitive keyboard shortcuts
+Oh My Zsh with custom functions: `ex` (extract), `repos` (fuzzy repo browser), `v` (fzf file opener).
 
-### Fastfetch (.config/fastfetch/config.jsonc)
-
-- Fast system information display
-- Custom configuration with waifu image
-
-## Post-Installation Configuration
-
-### 1. Restart terminal
+## Installation
 
 ```bash
-exec zsh
+git clone https://github.com/Awerito/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+stow hyprde  # Desktop environment
 ```
 
-### 2. Configure Git
+### Hyprland DE dependencies
 
 ```bash
-git config --global user.name "Your Name"
-git config --global user.email "your@email.com"
+sudo pacman -S --needed hyprland waybar thunar gvfs gvfs-mtp tumbler \
+  wl-clipboard cliphist grim slurp swaybg swaylock \
+  polkit-gnome xdg-desktop-portal-hyprland \
+  wl-clip-persist gsimplecal awww dart-sass gtksourceview3
+paru -S ags-hyprpanel-git
 ```
 
-### 3. Generate SSH Key (optional)
-
-```bash
-ssh-keygen -t ed25519 -C "your@email.com"
-cat ~/.ssh/id_ed25519.pub
-# Copy the output and add it to GitHub/GitLab
-```
-
-### 4. Configure Claude Code (optional)
-
-```bash
-claude-code auth login
-```
-
-### 5. Open Neovim
-
-The first time you open Neovim, plugins will be installed automatically:
-
-```bash
-nvim
-```
-
-## Customization
-
-### Modify configurations
-
-All configurations are in separate files for easy editing:
-
-```bash
-# Edit Zsh
-nvim ~/.zshrc
-
-# Edit Neovim (modular structure)
-nvim ~/.config/nvim/lua/config/options.lua   # General settings
-nvim ~/.config/nvim/lua/config/keymaps.lua   # Key mappings
-nvim ~/.config/nvim/lua/plugins/             # Plugin configs
-
-# Edit Kitty
-nvim ~/.config/kitty/kitty.conf
-
-# Edit Fastfetch
-nvim ~/.config/fastfetch/config.jsonc
-```
-
-### Add new configurations
-
-1. Add your files to the `~/.dotfiles` repository
-2. Use GNU Stow to create the symlinks:
-   ```bash
-   cd ~/.dotfiles
-   stow --adopt .
-   ```
-
-## Uninstallation
-
-To remove symlinks created by Stow:
+## Stow management
 
 ```bash
 cd ~/.dotfiles
-stow -D .
+stow hyprde        # Apply DE configs
+stow -D hyprde     # Remove DE symlinks
+stow -R hyprde     # Re-apply (unstow + stow)
+stow --adopt hyprde # Adopt existing files into stow
 ```
-
-To uninstall completely:
-
-```bash
-# Remove symlinks
-cd ~/.dotfiles
-stow -D .
-
-# Restore default shell
-chsh -s /bin/bash
-
-# Remove directories (optional, backup first)
-rm -rf ~/.dotfiles
-rm -rf ~/.oh-my-zsh
-rm -rf ~/.nvm
-```
-
-## Stow Management Structure
-
-This repository uses GNU Stow to manage symlinks. Stow creates symbolic links from `~/.dotfiles/` to your `$HOME`, enabling:
-
-- Git versioning
-- Easy synchronization between machines
-- Simple rollback of changes
-- Automatic configuration backups
-
-## Troubleshooting
-
-### Error: "command not found" after installation
-
-Restart your terminal or run:
-```bash
-exec zsh
-```
-
-### Neovim doesn't show icons correctly
-
-Make sure your terminal is using a Nerd Font:
-- In Kitty: check `~/.config/kitty/kitty.conf`
-- Ubuntu Mono Nerd Font is installed automatically
-
-### Zsh plugins don't work
-
-Plugins auto-install on first startup. If there are issues, run:
-```bash
-source ~/.zshrc
-```
-
-### Problems with NVM
-
-Load NVM manually:
-```bash
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-```
-
-### Script fails with permission errors
-
-Make sure you have sudo permissions:
-```bash
-sudo -v
-./scripts/setup.sh
-```
-
-## Dry Run Mode
-
-Before running the full script, you can test to see what changes it would make:
-
-```bash
-./scripts/setup.sh --dry-run
-```
-
-This will show all the actions it would execute without making any real changes to your system.
 
 ## License
 
 MIT License - see the [LICENSE](LICENSE) file for more details.
-
-## Acknowledgments
-
-- [Oh My Zsh](https://ohmyz.sh/)
-- [Neovim](https://neovim.io/)
-- [Kitty](https://sw.kovidgoyal.net/kitty/)
-- [GNU Stow](https://www.gnu.org/software/stow/)
-- GitHub dotfiles community
-
----
-
-**Note**: This is a personal development environment. Feel free to fork and adapt it to your needs.

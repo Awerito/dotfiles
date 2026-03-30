@@ -1,0 +1,9 @@
+[[mgr.prepend_keymap]]
+on   = "W"
+run  = '''shell -- bash -c '
+    IMAGE="$(realpath "%h")"
+    cp "$IMAGE" ~/.config/background
+    swww img "$IMAGE" --transition-type fade --transition-duration 1
+    notify-send "Wallpaper changed" "$(basename "$IMAGE")"
+' '''
+desc = "Set image as wallpaper"

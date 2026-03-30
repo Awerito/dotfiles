@@ -1,0 +1,10 @@
+[terminal]
+vt = 1
+
+[initial_session]
+command = "/usr/bin/start-hyprland"
+user = "awe"
+
+[default_session]
+command = "tuigreet --cmd /usr/bin/start-hyprland --remember"
+user = "greeter"

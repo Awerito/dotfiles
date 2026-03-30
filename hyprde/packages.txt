@@ -1,0 +1,35 @@
+# Compositor
+hyprland
+hyprlock
+hyprpolkitagent
+hyprpicker
+ags-hyprpanel-git
+xdg-desktop-portal-hyprland
+xorg-xwayland
+
+# Wallpaper
+awww
+
+# Clipboard
+wl-clipboard
+wl-clip-persist
+cliphist
+
+# Screenshots
+grim
+slurp
+grimblast-git
+
+# Apps
+kitty
+rofi
+pavucontrol
+brightnessctl
+gnome-keyring
+
+# Utilities
+jq
+stow
+
+# Login
+greetd-tuigreet

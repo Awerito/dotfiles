@@ -316,5 +316,24 @@
   "theme.bar.menus.menu.media.timestamp": "#a89984",
   "theme.bar.menus.menu.media.slider.primary": "#d4a0b9",
   "theme.bar.menus.menu.media.slider.background": "#3c3836",
-  "theme.bar.menus.menu.media.slider.puck": "#ebdbb2"
+  "theme.bar.menus.menu.media.slider.puck": "#ebdbb2",
+  "bar.windowtitle.class_name": false,
+  "bar.windowtitle.custom_title": true,
+  "bar.windowtitle.title_map": [
+    [
+      "com.rtosta.zapzap",
+      "󰖣",
+      "WhatsApp"
+    ],
+    [
+      "brave-akpamiohjfcnimfljfndmaldlcfphjmp",
+      "󰋯",
+      "Instagram"
+    ],
+    [
+      "signal",
+      "󰭹",
+      "Signal"
+    ]
+  ]
 }

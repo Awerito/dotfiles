@@ -3,6 +3,7 @@ hyprland
 hyprlock
 hyprpolkitagent
 hyprpicker
+hypridle
 ags-hyprpanel-git
 xdg-desktop-portal-hyprland
 xorg-xwayland

@@ -22,12 +22,7 @@
       "hud_notifications": true
     },
     "power": {
-      "enabled": true,
-      "low_percent": 10,
-      "critical_percent": 5,
-      "low_command": "",
-      "critical_command": "",
-      "hud_notifications": true
+      "enabled": false
     }
   },
   "audio": {
@@ -36,155 +31,10 @@
     "volume_exceed_maximum": false,
     "hud_notifications": true
   },
-  "panels": [
-    {
-      "id": "panel0",
-      "edge": "EDGE_TOP",
-      "size": 40,
-      "monitor": "",
-      "modules": [
-        {
-          "pager": {
-            "icon_size": 14,
-            "active_monitor_only": false,
-            "scroll_wrap_workspaces": true,
-            "scroll_include_inactive": true,
-            "enable_workspace_names": false,
-            "pinned": [
-              1,
-              2,
-              3,
-              4,
-              5
-            ],
-            "ignore_windows": [],
-            "preview_width": 180,
-            "follow_window_on_move": false
-          }
-        },
-        {
-          "spacer": {
-            "size": 8,
-            "expand": false
-          }
-        },
-        {
-          "taskbar": {
-            "icon_size": 28,
-            "active_workspace_only": true,
-            "active_monitor_only": true,
-            "group_tasks": true,
-            "hide_indicators": false,
-            "expand": true,
-            "max_size": 0,
-            "pinned": [],
-            "preview_width": 200
-          }
-        },
-        {
-          "spacer": {
-            "size": 8,
-            "expand": false
-          }
-        },
-        {
-          "systray": {
-            "icon_size": 20,
-            "menu_icon_size": 20,
-            "auto_hide_statuses": [],
-            "auto_hide_delay": "4s",
-            "pinned": [],
-            "modules": [
-              {
-                "power": {
-                  "icon_size": 20,
-                  "icon_symbolic": true
-                }
-              }
-            ]
-          }
-        },
-        {
-          "spacer": {
-            "size": 8,
-            "expand": false
-          }
-        },
-        {
-          "audio": {
-            "icon_size": 20,
-            "icon_symbolic": true,
-            "command_mixer": "",
-            "enable_source": true
-          }
-        },
-        {
-          "spacer": {
-            "size": 8,
-            "expand": false
-          }
-        },
-        {
-          "notifications": {
-            "icon_size": 20,
-            "notification_icon_size": 48,
-            "default_timeout": "7s",
-            "position": "POSITION_TOP_RIGHT",
-            "margin": 24,
-            "persistent": []
-          }
-        },
-        {
-          "spacer": {
-            "size": 8,
-            "expand": false
-          }
-        },
-        {
-          "clock": {
-            "time_format": "15:04",
-            "date_format": "2006-01-02",
-            "tooltip_time_format": "15:04",
-            "tooltip_date_format": "Mon, 02 Jan 2006 MST",
-            "additional_regions": []
-          }
-        },
-        {
-          "spacer": {
-            "size": 8,
-            "expand": false
-          }
-        },
-        {
-          "hud": {
-            "notification_icon_size": 64,
-            "timeout": "2s",
-            "position": "POSITION_BOTTOM",
-            "margin": 256
-          }
-        },
-        {
-          "session": {
-            "icon_size": 24,
-            "icon_symbolic": true,
-            "overlay_icon_size": 96,
-            "overlay_icon_symbolic": true,
-            "command_logout": "loginctl terminate-session $XDG_SESSION_ID",
-            "command_reboot": "systemctl reboot",
-            "command_suspend": "systemctl suspend",
-            "command_shutdown": "systemctl poweroff"
-          }
-        }
-      ]
-    }
-  ],
   "icon_overrides": [],
   "launch_wrapper": [
     "sh",
     "-c"
-  ],
-  "bar.customModules.storage.paths": [
-    "/"
   ],
   "theme.font.name": "MesloLGS Nerd Font Mono",
   "theme.font.label": "MesloLGS Nerd Font Mono",
@@ -270,11 +120,7 @@
   "theme.bar.menus.menu.clock.time.timeperiod": "#a89984",
   "menus.media.preferredPlayer": "Spotify",
   "menus.clock.weather.enabled": false,
-  "menus.dashboard.powermenu.avatar.image": "/home/awe/Pictures/Wallpapers/001_129464025_p0.jpg",
-  "theme.bar.buttons.modules.microphone.enableBorder": false,
-  "bar.customModules.microphone.label": true,
   "theme.bar.menus.monochrome": true,
-  "wallpaper.pywal": false,
   "bar.layouts": {
     "*": {
       "left": [
@@ -300,7 +146,6 @@
   "bar.workspaces.ignored": "",
   "bar.workspaces.monitorSpecific": false,
   "bar.network.showWifiInfo": true,
-  "bar.battery.hideBattery": false,
   "bar.media.show_active_only": true,
   "theme.bar.menus.menu.media.background.color": "#1d2021",
   "theme.bar.menus.menu.media.border.color": "#504945",
@@ -335,5 +180,8 @@
       "󰭹",
       "Signal"
     ]
+  ],
+  "bar.customModules.storage.paths": [
+    "/"
   ]
 }

@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Arrange 3 tiled windows into 3 equal columns.
+# Assumes the starting layout is: one window full-height on one side, the
+# other two stacked on the opposite side.
+set -euo pipefail
+
+ws=$(hyprctl -j activeworkspace | jq -r '.id')
+mon=$(hyprctl -j activeworkspace | jq -r '.monitor')
+
+data() {
+  hyprctl -j clients | jq --argjson ws "$ws" \
+    '[.[] | select(.workspace.id==$ws and .floating==false and .hidden==false)]'
+}
+
+d=$(data)
+count=$(echo "$d" | jq length)
+if [ "$count" -ne 3 ]; then
+  exit 0
+fi
+
+# Single = the window with the tallest height (spans full usable height).
+# The other two share an X coordinate (stacked pair).
+single=$(echo "$d" | jq -r 'sort_by(.size[1]) | reverse | .[0].address')
+single_x=$(echo "$d" | jq -r --arg s "$single" '.[]|select(.address==$s)|.at[0]')
+pair_addr=$(echo "$d" | jq -r --arg s "$single" '[.[]|select(.address!=$s)] | sort_by(.at[1]) | .[0].address')
+
+# Flip the pair's split so they sit side-by-side instead of stacked.
+hyprctl dispatch focuswindow "address:$pair_addr" >/dev/null
+hyprctl dispatch layoutmsg togglesplit >/dev/null
+sleep 0.1
+
+# Compute target column width from monitor dimensions + gaps.
+read -r mw rx rr <<<"$(hyprctl -j monitors | jq -r --arg m "$mon" \
+  '.[]|select(.name==$m)|"\(.width) \(.reserved[0]) \(.reserved[2])"')"
+gap_in=$(hyprctl -j getoption general:gaps_in | jq -r '.custom // .str // "5"' | awk '{print $1}')
+gap_out=$(hyprctl -j getoption general:gaps_out | jq -r '.custom // .str // "5"' | awk '{print $1}')
+usable_w=$(( mw - rx - rr - 2*gap_out ))
+col_w=$(( (usable_w - 2*gap_in) / 3 ))
+
+# Resize the single window to col_w. Sign convention: resizeactive dx moves
+# the split boundary; for a right-side child the effect is inverted.
+d=$(data)
+cur_w=$(echo "$d" | jq -r --arg s "$single" '.[]|select(.address==$s)|.size[0]')
+other_x=$(echo "$d" | jq -r --arg s "$single" '[.[]|select(.address!=$s)] | .[0].at[0]')
+
+if [ "$single_x" -lt "$other_x" ]; then
+  # Case A: single on the left — normal delta sign.
+  delta=$(( col_w - cur_w ))
+else
+  # Case B: single on the right — inverted sign.
+  delta=$(( cur_w - col_w ))
+fi
+
+hyprctl dispatch focuswindow "address:$single" >/dev/null
+hyprctl dispatch resizeactive "$delta" 0 >/dev/null

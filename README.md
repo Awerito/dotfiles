@@ -21,7 +21,43 @@ stow hyprde
 
 ## Dependencies
 
-See `hyprde-packages.txt` for the full list.
+### Base
+- zsh
+- oh-my-zsh
+- neovim
+- kitty
+- fastfetch
+- stow
+- fzf
+- ripgrep
+- jq
+- ttf-meslo-nerd
+- zsh-autosuggestions
+- zsh-syntax-highlighting
+
+### HyprDE
+- hyprland
+- hyprlock
+- hypridle
+- hyprpicker
+- hyprpolkitagent
+- hyprpanel
+- xdg-desktop-portal-hyprland
+- xorg-xwayland
+- awww
+- wl-clipboard
+- wl-clip-persist
+- cliphist
+- grim
+- slurp
+- grimblast
+- rofi
+- pavucontrol
+- brightnessctl
+- gnome-keyring
+- greetd-tuigreet
+
+All installed via `./install.sh`.
 
 ## License
 

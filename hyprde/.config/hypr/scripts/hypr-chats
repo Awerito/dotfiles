@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+hyprctl dispatch workspace 1
+
+wait_for() {
+    while ! hyprctl clients -j | grep -q "\"class\": \"$1\""; do sleep 0.05; done
+}
+
+slack &disown
+wait_for Slack
+
+signal-desktop --password-store="gnome-libsecret" &disown
+wait_for signal
+
+hyprctl dispatch focuswindow "class:Slack"
+/opt/brave-bin/brave --profile-directory=Default --app-id=akpamiohjfcnimfljfndmaldlcfphjmp &disown
+wait_for brave-akpamiohjfcnimfljfndmaldlcfphjmp-Default
+
+hyprctl dispatch focuswindow "class:signal"
+zapzap &disown

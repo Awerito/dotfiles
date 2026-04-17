@@ -7,3 +7,18 @@ run  = '''shell -- bash -c '
     notify-send "Wallpaper changed" "$(basename "$IMAGE")"
 ' '''
 desc = "Set image as wallpaper"
+
+[[mgr.prepend_keymap]]
+on   = "f"
+run  = "plugin jump-to-char"
+desc = "Jump to char"
+
+[[mgr.prepend_keymap]]
+on   = "F"
+run  = "plugin smart-filter"
+desc = "Smart filter"
+
+[[mgr.prepend_keymap]]
+on   = ["c", "m"]
+run  = "plugin chmod"
+desc = "Chmod"

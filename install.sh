@@ -75,6 +75,17 @@ for plugin in zsh-autosuggestions zsh-syntax-highlighting; do
 done
 
 # ============================================
+# YAZI PLUGINS
+# ============================================
+echo "Installing yazi plugins..."
+ya pkg add bennyyip/gruvbox-dark
+ya pkg add yazi-rs/plugins:full-border
+ya pkg add yazi-rs/plugins:jump-to-char
+ya pkg add yazi-rs/plugins:smart-filter
+ya pkg add yazi-rs/plugins:chmod
+ya pkg add yazi-rs/plugins:git
+
+# ============================================
 # DEFAULT SHELL
 # ============================================
 if [ "$SHELL" != "$(which zsh)" ]; then

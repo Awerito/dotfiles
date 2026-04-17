@@ -1,2 +1,5 @@
 base/.config/nvim/lazy-lock.json
 base/.local/bin/
+hyprde/.config/yazi/plugins/
+hyprde/.config/yazi/flavors/
+hyprde/.config/yazi/package.toml

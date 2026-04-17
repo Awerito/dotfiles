@@ -68,7 +68,7 @@ repos() {
 }
 
 ytd() {
-    cd $HOME/Videos/ && xclip -o > /tmp/ytdlink.txt && yt-dlp -f mp4 -a /tmp/ytdlink.txt
+    cd $HOME/Videos/ && wl-copy > /tmp/ytdlink.txt && /tmp/yt-dlp -f mp4 -a /tmp/ytdlink.txt
 }
 
 gi() {

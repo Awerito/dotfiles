@@ -1,2 +1,2 @@
-.config/nvim/lazy-lock.json
-.local/bin/
+base/.config/nvim/lazy-lock.json
+base/.local/bin/

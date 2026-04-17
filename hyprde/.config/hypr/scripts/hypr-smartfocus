@@ -27,9 +27,21 @@ if [ "$WIN_WS" != "$WS_ID" ]; then
 fi
 
 WIN_X=$(echo "$WIN" | jq '.at[0]')
+WIN_FLOATING=$(echo "$WIN" | jq '.floating')
 
-# Get all windows in current workspace sorted by X position
-CLIENTS=$(hyprctl clients -j | jq -r "[.[] | select(.workspace.id == $WS_ID)] | sort_by(.at[0])")
+# Get tiled windows in current workspace sorted by X position
+CLIENTS=$(hyprctl clients -j | jq -r "[.[] | select(.workspace.id == $WS_ID and .floating == false)] | sort_by(.at[0])")
+COUNT=$(echo "$CLIENTS" | jq 'length')
+
+# No tiled windows (workspace empty aside from floating PiP) → just switch workspace
+if [ "$COUNT" = "0" ] || [ "$WIN_FLOATING" = "true" ]; then
+    case "$DIR" in
+        l) [ "$WS_ID" -gt 1 ] && hyprctl dispatch workspace -1 ;;
+        r) [ "$WS_ID" -lt 5 ] && hyprctl dispatch workspace +1 ;;
+    esac
+    exit 0
+fi
+
 LEFTMOST=$(echo "$CLIENTS" | jq '.[0].at[0]')
 RIGHTMOST=$(echo "$CLIENTS" | jq '.[-1].at[0]')
 

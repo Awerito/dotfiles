@@ -5,6 +5,7 @@ vt = 1
 command = "/usr/bin/start-hyprland"
 user = "awe"
 
+# Fallback if initial_session (Hyprland) crashes
 [default_session]
 command = "tuigreet --cmd /usr/bin/start-hyprland --remember"
 user = "greeter"

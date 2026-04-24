@@ -1,0 +1,26 @@
+#!/bin/bash
+# Toggle a floating Quake-style terminal in the special:pip workspace.
+
+find_terminal() {
+    hyprctl clients -j | jq -r '[.[] | select(.class=="pipterm") | .address] | first // empty'
+}
+
+address=$(find_terminal)
+
+if [ -n "$address" ]; then
+    hyprctl dispatch togglespecialworkspace pip
+    exit 0
+fi
+
+kitty --override confirm_os_window_close=0 --override remember_window_size=no --class pipterm &disown
+
+while [ -z "$address" ]; do
+    sleep 0.05
+    address=$(find_terminal)
+done
+
+read -r monitor_width monitor_height < <(hyprctl monitors -j | jq -r '.[] | select(.focused) | "\(.width) \(.height)"')
+
+hyprctl dispatch resizewindowpixel "exact $((monitor_width * 60 / 100)) $((monitor_height * 60 / 100)),address:$address"
+hyprctl dispatch focuswindow "address:$address"
+hyprctl dispatch centerwindow

@@ -157,3 +157,6 @@ zstyle ':completion:*' menu select
 
 # opencode
 export PATH=/home/awe/.opencode/bin:$PATH
+
+# Local overrides
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local

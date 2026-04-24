@@ -1,54 +1,61 @@
 #!/bin/bash
-# Smart focus: move focus within workspace, or switch desktop at edges
-# Usage: hypr-smartfocus <l|r>
+# Focus the geometric neighbor tiled window.
+# At a horizontal edge, switch workspace (bounded 1..5).
+# Vertical edges are hard stops.
+# Usage: hypr-smartfocus <l|r|u|d>
 
-DIR="$1"
-WIN=$(hyprctl activewindow -j)
-WS_ID=$(hyprctl activeworkspace -j | jq '.id')
+direction="$1"
+current_workspace=$(hyprctl activeworkspace -j | jq '.id')
 
-# No windows or no active window → just switch workspace
-if [ -z "$WIN" ] || [ "$WIN" = "{}" ] || echo "$WIN" | jq -e '.address == "0x0"' >/dev/null 2>&1; then
-    case "$DIR" in
-        l) [ "$WS_ID" -gt 1 ] && hyprctl dispatch workspace -1 ;;
-        r) [ "$WS_ID" -lt 5 ] && hyprctl dispatch workspace +1 ;;
+switch_workspace_at_edge() {
+    case "$direction" in
+        l) [ "$current_workspace" -gt 1 ] && hyprctl dispatch workspace -1 ;;
+        r) [ "$current_workspace" -lt 5 ] && hyprctl dispatch workspace +1 ;;
     esac
-    exit 0
+}
+
+find_neighbor() {
+    local axis sign
+    case "$direction" in
+        l) axis=0; sign=-1 ;;
+        r) axis=0; sign=1 ;;
+        u) axis=1; sign=-1 ;;
+        d) axis=1; sign=1 ;;
+    esac
+    echo "$tiled_clients" | jq -r \
+        --argjson x "$active_x" --argjson y "$active_y" \
+        --argjson w "$active_width" --argjson h "$active_height" \
+        --argjson axis "$axis" --argjson sign "$sign" '
+        ([$x, $y])     as $origin |
+        ([$w, $h])     as $size   |
+        (1 - $axis)    as $perp   |
+        ($origin[$axis] + $size[$axis] / 2) as $midpoint |
+        [.[] | select(
+            (if $sign == 1
+                then .at[$axis] > $midpoint
+                else (.at[$axis] + .size[$axis]) < $midpoint
+             end)
+            and .at[$perp] < ($origin[$perp] + $size[$perp])
+            and (.at[$perp] + .size[$perp]) > $origin[$perp]
+        )] | sort_by($sign * .at[$axis]) | .[0] // empty | .address'
+}
+
+# Extract active window info.
+active_window=$(hyprctl activewindow -j)
+read -r active_x active_y active_width active_height active_floating active_workspace < <(
+    echo "$active_window" | jq -r '"\(.at[0]) \(.at[1]) \(.size[0]) \(.size[1]) \(.floating) \(.workspace.id)"' 2>/dev/null
+)
+tiled_clients=$(hyprctl clients -j | jq -r "[.[] | select(.workspace.id == $current_workspace and .floating == false)]")
+
+# Only look for a neighbor if the active window is itself a tiled window
+# on the current workspace; otherwise fall through to the edge behavior.
+neighbor_address=
+if [ "$active_workspace" = "$current_workspace" ] && [ "$active_floating" = "false" ]; then
+    neighbor_address=$(find_neighbor)
 fi
 
-WIN_WS=$(echo "$WIN" | jq '.workspace.id')
-
-# Active window is on a different workspace (stale focus) → just switch
-if [ "$WIN_WS" != "$WS_ID" ]; then
-    case "$DIR" in
-        l) [ "$WS_ID" -gt 1 ] && hyprctl dispatch workspace -1 ;;
-        r) [ "$WS_ID" -lt 5 ] && hyprctl dispatch workspace +1 ;;
-    esac
-    exit 0
-fi
-
-WIN_X=$(echo "$WIN" | jq '.at[0]')
-WIN_FLOATING=$(echo "$WIN" | jq '.floating')
-
-# Get tiled windows in current workspace sorted by X position
-CLIENTS=$(hyprctl clients -j | jq -r "[.[] | select(.workspace.id == $WS_ID and .floating == false)] | sort_by(.at[0])")
-COUNT=$(echo "$CLIENTS" | jq 'length')
-
-# No tiled windows (workspace empty aside from floating PiP) → just switch workspace
-if [ "$COUNT" = "0" ] || [ "$WIN_FLOATING" = "true" ]; then
-    case "$DIR" in
-        l) [ "$WS_ID" -gt 1 ] && hyprctl dispatch workspace -1 ;;
-        r) [ "$WS_ID" -lt 5 ] && hyprctl dispatch workspace +1 ;;
-    esac
-    exit 0
-fi
-
-LEFTMOST=$(echo "$CLIENTS" | jq '.[0].at[0]')
-RIGHTMOST=$(echo "$CLIENTS" | jq '.[-1].at[0]')
-
-if [ "$DIR" = "l" ] && [ "$WIN_X" = "$LEFTMOST" ]; then
-    [ "$WS_ID" -gt 1 ] && hyprctl dispatch workspace -1
-elif [ "$DIR" = "r" ] && [ "$WIN_X" = "$RIGHTMOST" ]; then
-    [ "$WS_ID" -lt 5 ] && hyprctl dispatch workspace +1
+if [ -n "$neighbor_address" ]; then
+    hyprctl dispatch focuswindow "address:$neighbor_address"
 else
-    hyprctl dispatch movefocus "$DIR"
+    switch_workspace_at_edge
 fi

@@ -1,28 +1,19 @@
 #!/bin/bash
-# Smart window move: swap within workspace, or move to adjacent desktop at edges
+# Move the active window; at a horizontal edge, push it to the adjacent
+# workspace. Vertical edges are hard stops.
 # Usage: hypr-movewindow <l|d|u|r>
 
-DIR="$1"
+direction="$1"
 
-# Get current position before move
-INFO=$(hyprctl activewindow -j)
-POS_X=$(echo "$INFO" | jq '.at[0]')
-POS_Y=$(echo "$INFO" | jq '.at[1]')
+# movewindow silently no-ops at the tree edge, so detect "didn't move" by
+# comparing position before and after.
+read -r x_before y_before < <(hyprctl activewindow -j | jq -r '"\(.at[0]) \(.at[1])"')
+hyprctl dispatch movewindow "$direction"
+read -r x_after y_after current_workspace < <(hyprctl activewindow -j | jq -r '"\(.at[0]) \(.at[1]) \(.workspace.id)"')
 
-# Try moving within workspace
-hyprctl dispatch movewindow "$DIR"
-
-# For horizontal moves, if window didn't move, go to adjacent desktop
-if [ "$DIR" = "l" ] || [ "$DIR" = "r" ]; then
-    NEW_INFO=$(hyprctl activewindow -j)
-    NEW_X=$(echo "$NEW_INFO" | jq '.at[0]')
-    NEW_Y=$(echo "$NEW_INFO" | jq '.at[1]')
-
-    if [ "$POS_X" = "$NEW_X" ] && [ "$POS_Y" = "$NEW_Y" ]; then
-        WS_ID=$(hyprctl activewindow -j | jq '.workspace.id')
-        case "$DIR" in
-            l) [ "$WS_ID" -gt 1 ] && hyprctl dispatch movetoworkspace -1 ;;
-            r) [ "$WS_ID" -lt 5 ] && hyprctl dispatch movetoworkspace +1 ;;
-        esac
-    fi
+if [ "$x_before" = "$x_after" ] && [ "$y_before" = "$y_after" ]; then
+    case "$direction" in
+        l) [ "$current_workspace" -gt 1 ] && hyprctl dispatch movetoworkspace -1 ;;
+        r) [ "$current_workspace" -lt 5 ] && hyprctl dispatch movetoworkspace +1 ;;
+    esac
 fi

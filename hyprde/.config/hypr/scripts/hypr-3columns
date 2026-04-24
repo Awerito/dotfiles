@@ -1,55 +1,104 @@
 #!/usr/bin/env bash
-# Arrange 3 tiled windows into 3 equal columns.
-# Assumes the starting layout is: one window full-height on one side, the
-# other two stacked on the opposite side.
+# Arrange 3 tiled windows into 3 equal columns on the current workspace.
+# Normalizes the tree to a known shape (all three side-by-side in one row),
+# then pins widths to W/3.
+
 set -euo pipefail
 
-ws=$(hyprctl -j activeworkspace | jq -r '.id')
-mon=$(hyprctl -j activeworkspace | jq -r '.monitor')
+workspace=$(hyprctl -j activeworkspace | jq -r '.id')
+monitor=$(hyprctl -j activeworkspace | jq -r '.monitor')
 
-data() {
-  hyprctl -j clients | jq --argjson ws "$ws" \
-    '[.[] | select(.workspace.id==$ws and .floating==false and .hidden==false)]'
+tiled_clients() {
+    hyprctl -j clients | jq --argjson ws "$workspace" \
+        '[.[] | select(.workspace.id==$ws and .floating==false and .hidden==false)]'
 }
 
-d=$(data)
-count=$(echo "$d" | jq length)
-if [ "$count" -ne 3 ]; then
-  exit 0
+wait_same_y() {
+    local a=$1 b=$2 attempts=50
+    while [ "$attempts" -gt 0 ]; do
+        local ys
+        ys=$(hyprctl -j clients | jq -r --arg a "$a" --arg b "$b" \
+            '[.[]|select(.address==$a or .address==$b)|.at[1]] | unique | length')
+        [ "$ys" = "1" ] && return
+        sleep 0.02
+        attempts=$((attempts - 1))
+    done
+}
+
+clients=$(tiled_clients)
+[ "$(echo "$clients" | jq length)" -eq 3 ] || exit 0
+
+# Identify the true tree pair. Priority:
+#   1. Stacked (same X, different Y) — unambiguous sibling pair.
+#   2. Side-by-side where the third window is on a different Y row.
+#   3. Fallback: all three already in a row; arbitrary pair.
+read -r pair_a pair_b single pair_stacked <<< "$(echo "$clients" | jq -r '
+    . as $c |
+    ( [[0,1,2],[0,2,1],[1,2,0]]
+      | map(. as $p |
+          if ($c[$p[0]].at[0] == $c[$p[1]].at[0] and $c[$p[0]].at[1] != $c[$p[1]].at[1])
+              then {a: $c[$p[0]], b: $c[$p[1]], s: $c[$p[2]], stacked: true}
+          elif ($c[$p[0]].at[1] == $c[$p[1]].at[1]
+                and $c[$p[0]].at[0] != $c[$p[1]].at[0]
+                and $c[$p[2]].at[1] != $c[$p[0]].at[1])
+              then {a: $c[$p[0]], b: $c[$p[1]], s: $c[$p[2]], stacked: false}
+          else null end)
+      | map(select(. != null))
+      | .[0]
+    ) // {a: $c[0], b: $c[1], s: $c[2], stacked: false}
+    | "\(.a.address) \(.b.address) \(.s.address) \(.stacked)"
+')"
+
+# Normalize: all three windows end up on the same row.
+if [ "$pair_stacked" = "true" ]; then
+    hyprctl dispatch focuswindow "address:$pair_a" >/dev/null
+    hyprctl dispatch layoutmsg togglesplit >/dev/null
+    wait_same_y "$pair_a" "$pair_b"
 fi
 
-# Single = the window with the tallest height (spans full usable height).
-# The other two share an X coordinate (stacked pair).
-single=$(echo "$d" | jq -r 'sort_by(.size[1]) | reverse | .[0].address')
-single_x=$(echo "$d" | jq -r --arg s "$single" '.[]|select(.address==$s)|.at[0]')
-pair_addr=$(echo "$d" | jq -r --arg s "$single" '[.[]|select(.address!=$s)] | sort_by(.at[1]) | .[0].address')
-
-# Flip the pair's split so they sit side-by-side instead of stacked.
-hyprctl dispatch focuswindow "address:$pair_addr" >/dev/null
-hyprctl dispatch layoutmsg togglesplit >/dev/null
-sleep 0.1
-
-# Compute target column width from monitor dimensions + gaps.
-read -r mw rx rr <<<"$(hyprctl -j monitors | jq -r --arg m "$mon" \
-  '.[]|select(.name==$m)|"\(.width) \(.reserved[0]) \(.reserved[2])"')"
-gap_in=$(hyprctl -j getoption general:gaps_in | jq -r '.custom // .str // "5"' | awk '{print $1}')
-gap_out=$(hyprctl -j getoption general:gaps_out | jq -r '.custom // .str // "5"' | awk '{print $1}')
-usable_w=$(( mw - rx - rr - 2*gap_out ))
-col_w=$(( (usable_w - 2*gap_in) / 3 ))
-
-# Resize the single window to col_w. Sign convention: resizeactive dx moves
-# the split boundary; for a right-side child the effect is inverted.
-d=$(data)
-cur_w=$(echo "$d" | jq -r --arg s "$single" '.[]|select(.address==$s)|.size[0]')
-other_x=$(echo "$d" | jq -r --arg s "$single" '[.[]|select(.address!=$s)] | .[0].at[0]')
-
-if [ "$single_x" -lt "$other_x" ]; then
-  # Case A: single on the left — normal delta sign.
-  delta=$(( col_w - cur_w ))
-else
-  # Case B: single on the right — inverted sign.
-  delta=$(( cur_w - col_w ))
+single_y=$(hyprctl -j clients | jq -r --arg s "$single" '.[]|select(.address==$s)|.at[1]')
+pair_y=$(hyprctl -j clients | jq -r --arg a "$pair_a" '.[]|select(.address==$a)|.at[1]')
+if [ "$single_y" != "$pair_y" ]; then
+    hyprctl dispatch focuswindow "address:$single" >/dev/null
+    hyprctl dispatch layoutmsg togglesplit >/dev/null
+    wait_same_y "$single" "$pair_a"
 fi
 
-hyprctl dispatch focuswindow "address:$single" >/dev/null
-hyprctl dispatch resizeactive "$delta" 0 >/dev/null
+# Hyprland reports size excluding border; visible gap between two adjacent
+# tiled windows is 2*border + 2*gap_in.
+read -r monitor_width reserved_left reserved_right <<< "$(hyprctl -j monitors | jq -r --arg m "$monitor" \
+    '.[] | select(.name==$m) | "\(.width) \(.reserved[0]) \(.reserved[2])"')"
+gap_in=$(hyprctl -j getoption general:gaps_in | jq -r '.custom' | awk '{print $1}')
+gap_out=$(hyprctl -j getoption general:gaps_out | jq -r '.custom' | awk '{print $1}')
+border=$(hyprctl -j getoption general:border_size | jq -r '.int')
+edge_offset=$(( gap_out + border ))
+inter_gap=$(( 2 * (border + gap_in) ))
+usable=$(( monitor_width - reserved_left - reserved_right - 2 * edge_offset - 2 * inter_gap ))
+column_width=$(( usable / 3 ))
+tolerance=$(( usable - 3 * column_width ))
+
+# Greedy convergence: each iteration resizes the window furthest from target.
+# Tolerance absorbs the remainder from usable/3 not dividing evenly.
+attempts=20
+while [ "$attempts" -gt 0 ]; do
+    clients=$(tiled_clients)
+    off_addr=$(echo "$clients" | jq -r --argjson target "$column_width" --argjson tol "$tolerance" '
+        [.[] | {address, diff: (.size[0] - $target | if . < 0 then -. else . end)}]
+        | sort_by(.diff) | reverse | .[0]
+        | if .diff > $tol then .address else "" end
+    ')
+    [ -z "$off_addr" ] && break
+
+    current=$(echo "$clients" | jq -r --arg a "$off_addr" '.[]|select(.address==$a)|.size[0]')
+    target_x=$(echo "$clients" | jq -r --arg a "$off_addr" '.[]|select(.address==$a)|.at[0]')
+    neighbor_x=$(echo "$clients" | jq -r --arg a "$off_addr" '[.[]|select(.address!=$a)]|.[0].at[0]')
+    if [ "$target_x" -lt "$neighbor_x" ]; then
+        delta=$(( column_width - current ))
+    else
+        delta=$(( current - column_width ))
+    fi
+    hyprctl dispatch focuswindow "address:$off_addr" >/dev/null
+    hyprctl dispatch resizeactive "$delta" 0 >/dev/null
+    sleep 0.1
+    attempts=$((attempts - 1))
+done

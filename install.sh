@@ -50,6 +50,8 @@ HYPRDE_PACKAGES=(
 
   # Apps
   rofi
+  rofimoji
+  wtype
   pavucontrol
   brightnessctl
   gnome-keyring

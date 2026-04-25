@@ -53,6 +53,8 @@ stow hyprde
 - grimblast
 - tesseract (with eng/spa data)
 - rofi
+- rofimoji
+- wtype
 - pavucontrol
 - brightnessctl
 - gnome-keyring

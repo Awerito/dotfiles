@@ -56,6 +56,7 @@ stow hyprde
 - brightnessctl
 - gnome-keyring
 - greetd-tuigreet
+- hyprswitch
 
 All installed via `./install.sh`.
 

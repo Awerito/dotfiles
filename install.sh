@@ -50,6 +50,7 @@ HYPRDE_PACKAGES=(
   pavucontrol
   brightnessctl
   gnome-keyring
+  hyprswitch
 
   # Login
   greetd-tuigreet

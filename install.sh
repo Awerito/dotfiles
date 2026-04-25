@@ -56,6 +56,7 @@ HYPRDE_PACKAGES=(
   brightnessctl
   gnome-keyring
   hyprswitch
+  wlogout
 
   # Login
   greetd-tuigreet

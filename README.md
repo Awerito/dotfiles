@@ -60,6 +60,7 @@ stow hyprde
 - gnome-keyring
 - greetd-tuigreet
 - hyprswitch
+- wlogout
 
 All installed via `./install.sh`.
 

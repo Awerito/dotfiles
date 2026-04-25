@@ -51,6 +51,7 @@ stow hyprde
 - grim
 - slurp
 - grimblast
+- tesseract (with eng/spa data)
 - rofi
 - pavucontrol
 - brightnessctl

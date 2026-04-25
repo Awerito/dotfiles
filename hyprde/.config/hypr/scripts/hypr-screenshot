@@ -1,6 +1,6 @@
 #!/bin/bash
-# Screenshot tool: area (with freeze), window, or fullscreen.
-# Usage: hypr-screenshot <area|window|full>
+# Screenshot tool: area (with freeze), window, fullscreen, or OCR.
+# Usage: hypr-screenshot <area|window|full|ocr>
 
 mode="$1"
 screenshots_dir="$HOME/Pictures/Screenshots"
@@ -23,5 +23,21 @@ case "$mode" in
         ;;
     full)
         grimblast copysave output "$output_file"
+        ;;
+    ocr)
+        hyprpicker -rzd &
+        picker_pid=$!
+        sleep 0.2
+        region=$(slurp)
+        kill $picker_pid 2>/dev/null
+        if [ -n "$region" ]; then
+            text=$(grim -g "$region" - | tesseract - - -l eng+spa 2>/dev/null)
+            if [ -n "$text" ]; then
+                printf '%s' "$text" | wl-copy
+                notify-send "OCR" "$(printf '%s' "$text" | head -c 200)"
+            else
+                notify-send "OCR" "No text recognized"
+            fi
+        fi
         ;;
 esac

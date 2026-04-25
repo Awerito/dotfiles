@@ -1,0 +1,28 @@
+#!/bin/bash
+# Show all Hyprland keybinds in a searchable rofi menu.
+
+decode_mods() {
+    local mask=$1
+    local mods=()
+    (( mask & 64 )) && mods+=("SUPER")
+    (( mask & 8  )) && mods+=("ALT")
+    (( mask & 4  )) && mods+=("CTRL")
+    (( mask & 1  )) && mods+=("SHIFT")
+    local IFS=+
+    echo "${mods[*]}"
+}
+
+hyprctl binds -j | jq -c '.[]' | while read -r entry; do
+    modmask=$(echo "$entry" | jq -r '.modmask')
+    key=$(echo "$entry" | jq -r '.key')
+    description=$(echo "$entry" | jq -r '.description')
+    dispatcher=$(echo "$entry" | jq -r '.dispatcher')
+    arg=$(echo "$entry" | jq -r '.arg')
+    mods=$(decode_mods "$modmask")
+    combo="${mods:+$mods+}$key"
+    if [ -n "$description" ]; then
+        printf '%-32s →  %s\n' "$combo" "$description"
+    else
+        printf '%-32s →  %s %s\n' "$combo" "$dispatcher" "$arg"
+    fi
+done | sort | rofi -dmenu -p "Keybinds" -i -no-custom -theme-str 'window {width: 60%;}'

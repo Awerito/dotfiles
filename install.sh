@@ -44,6 +44,9 @@ HYPRDE_PACKAGES=(
   grim
   slurp
   grimblast-git
+  tesseract
+  tesseract-data-eng
+  tesseract-data-spa
 
   # Apps
   rofi

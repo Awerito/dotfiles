@@ -61,6 +61,7 @@ stow hyprde
 - greetd-tuigreet
 - hyprswitch
 - wlogout
+- hyprexpo (via hyprpm, fork with `dynamic_grid`)
 
 All installed via `./install.sh`.
 

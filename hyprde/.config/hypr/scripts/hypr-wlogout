@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Launches wlogout with margins computed from the focused monitor so the
+# button grid stays centered and square at any resolution.
+
+set -e
+
+if pgrep -x wlogout >/dev/null; then
+  pkill -x wlogout
+  exit 0
+fi
+
+read -r W H < <(hyprctl monitors -j | jq -r '.[] | select(.focused) | "\(.width) \(.height)"')
+
+LAYOUT="${XDG_CONFIG_HOME:-$HOME/.config}/wlogout/layout"
+N=$(grep -c '"label"' "$LAYOUT")
+COLS=${1:-2}
+ROWS=$(( (N + COLS - 1) / COLS ))
+
+SHORT=$(( H < W ? H : W ))
+SIZE=$(( SHORT * 15 / 100 ))
+GAP=$(( SHORT / 60 ))
+
+AREA_W=$(( SIZE * COLS + GAP * (COLS - 1) ))
+AREA_H=$(( SIZE * ROWS + GAP * (ROWS - 1) ))
+
+L=$(( (W - AREA_W) / 2 ))
+T=$(( (H - AREA_H) / 2 ))
+
+exec wlogout -b "$COLS" -c "$GAP" -r "$GAP" -T "$T" -B "$T" -L "$L" -R "$L"

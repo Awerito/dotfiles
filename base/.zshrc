@@ -6,7 +6,7 @@ ZSH_THEME="robbyrussell"
 DISABLE_AUTO_UPDATE="false"
 ENABLE_CORRECTION="false"
 
-plugins=(git git-auto-fetch vi-mode poetry zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(git vi-mode poetry zsh-autosuggestions zsh-syntax-highlighting)
 
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 bindkey '^V' autosuggest-disable
@@ -21,7 +21,6 @@ fi
 # EDITOR & TERMINAL
 # ============================================
 export EDITOR='nvim'
-export TERM=xterm-256color
 bindkey -v
 export KEYTIMEOUT=1
 
@@ -128,16 +127,24 @@ alias jelidown='cd ~/.config/jellyfin && docker compose down && cd -'
 # ============================================
 export PATH=$PATH:$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin:$HOME/.local/scripts
 
-# NVM (compatible con instalación manual y pacman)
+# NVM (lazy load — carga al primer uso de nvm/node/npm/npx)
 export NVM_DIR="$HOME/.nvm"
-[ ! -d "$NVM_DIR" ] && mkdir -p "$NVM_DIR"
-if [ -s "$NVM_DIR/nvm.sh" ]; then
-  \. "$NVM_DIR/nvm.sh"
-elif [ -s "/usr/share/nvm/nvm.sh" ]; then
-  \. "/usr/share/nvm/nvm.sh"
-fi
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-[ -s "/usr/share/nvm/bash_completion" ] && \. "/usr/share/nvm/bash_completion"
+
+_nvm_load() {
+  unset -f nvm node npm npx _nvm_load
+  [ ! -d "$NVM_DIR" ] && mkdir -p "$NVM_DIR"
+  if [ -s "$NVM_DIR/nvm.sh" ]; then
+    \. "$NVM_DIR/nvm.sh"
+  elif [ -s "/usr/share/nvm/nvm.sh" ]; then
+    \. "/usr/share/nvm/nvm.sh"
+  fi
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+  [ -s "/usr/share/nvm/bash_completion" ] && \. "/usr/share/nvm/bash_completion"
+}
+nvm()  { _nvm_load; nvm "$@"; }
+node() { _nvm_load; node "$@"; }
+npm()  { _nvm_load; npm "$@"; }
+npx()  { _nvm_load; npx "$@"; }
 
 # LaTeX
 export PATH="$PATH:/usr/local/texlive/2024/bin/x86_64-linux"
@@ -152,7 +159,11 @@ export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
 # ============================================
 fpath+=~/.zfunc
 autoload -Uz compinit
-compinit
+if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
 zstyle ':completion:*' menu select
 
 # opencode

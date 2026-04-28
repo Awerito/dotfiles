@@ -9,6 +9,7 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
+DIM='\033[2m'
 NC='\033[0m'
 
 # Load config
@@ -26,30 +27,113 @@ fi
 
 source "$CONFIG_FILE"
 
-# Validate required config
 if [ -z "$SERVER" ] || [ -z "$PORT" ] || [ -z "$LOCAL_PATH" ]; then
     echo -e "${RED}✗ Missing config. Required: SERVER, PORT, LOCAL_PATH${NC}"
     exit 1
 fi
 
-# SSH command with timeout
 SSH_CMD="ssh -p $PORT -o ConnectTimeout=10"
+RSYNC_FILTER=(--filter=':- .gitignore' --delete -e "$SSH_CMD")
 
-# Ensure local path exists
 mkdir -p "$LOCAL_PATH"
 
-run_rsync() {
-    local output
-    local exit_code
-    output=$("$@" 2>&1)
+# Classify a single rsync itemize line.
+# Echoes: "added" | "modified" | "deleted" | "" (ignore)
+classify_change() {
+    local line="$1"
+    [[ "$line" == *deleting* ]] && { echo deleted; return; }
+    local flags="${line:0:11}"
+    # New file/dir: f or d followed by 9 plus signs
+    if [[ "$flags" =~ ^[\<\>ch][fd]\+{9}$ ]]; then
+        echo added
+        return
+    fi
+    case "${flags:0:1}" in
+        '>'|'<'|'c') echo modified ;;
+    esac
+}
+
+# Run a dry-run and produce per-dir summary.
+# Args: SRC DST DEPTH
+diff_summary() {
+    local src="$1" dst="$2" depth="$3"
+    local output exit_code
+    output=$(rsync -rin "${RSYNC_FILTER[@]}" --out-format='%i|%n' "$src" "$dst" 2>&1)
     exit_code=$?
+    if [ $exit_code -ne 0 ] && [ $exit_code -ne 23 ]; then
+        echo -e "${RED}✗ Connection failed (exit code $exit_code):${NC}" >&2
+        echo "$output" >&2
+        return $exit_code
+    fi
+
+    declare -A added modified deleted
+    local total_added=0 total_modified=0 total_deleted=0
+
+    while IFS='|' read -r flags path; do
+        [[ -z "$path" || "$path" == "./" || "$path" == */ ]] && continue
+        local kind
+        kind=$(classify_change "$flags$path")
+        [[ -z "$kind" ]] && continue
+
+        local dir
+        dir=$(echo "$path" | cut -d'/' -f1-"$depth")
+        if [[ $(echo "$path" | tr -cd '/' | wc -c) -ge $depth ]]; then
+            dir="$dir/"
+        fi
+
+        case "$kind" in
+            added)    ((added["$dir"]++));    ((total_added++)) ;;
+            modified) ((modified["$dir"]++)); ((total_modified++)) ;;
+            deleted)  ((deleted["$dir"]++));  ((total_deleted++)) ;;
+        esac
+    done <<< "$output"
+
+    local total=$((total_added + total_modified + total_deleted))
+
+    if [ $total -eq 0 ]; then
+        echo -e "${GREEN}✓ No differences${NC}"
+        return 0
+    fi
+
+    declare -A all_dirs
+    for dir in "${!added[@]}";    do all_dirs["$dir"]=1; done
+    for dir in "${!modified[@]}"; do all_dirs["$dir"]=1; done
+    for dir in "${!deleted[@]}";  do all_dirs["$dir"]=1; done
+
+    for dir in $(echo "${!all_dirs[@]}" | tr ' ' '\n' | sort); do
+        local a=${added["$dir"]:-0}
+        local m=${modified["$dir"]:-0}
+        local d=${deleted["$dir"]:-0}
+        local parts=""
+        [[ $a -gt 0 ]] && parts="${parts}${GREEN}+${a}${NC}  "
+        [[ $m -gt 0 ]] && parts="${parts}${YELLOW}~${m}${NC}  "
+        [[ $d -gt 0 ]] && parts="${parts}${RED}-${d}${NC}  "
+        printf "  %-40s %b\n" "$dir" "$parts"
+    done
+
+    echo
+    printf "  ${DIM}Summary:${NC} ${GREEN}+%d${NC}  ${YELLOW}~%d${NC}  ${RED}-%d${NC}  ${DIM}(%d files)${NC}\n" \
+        "$total_added" "$total_modified" "$total_deleted" "$total"
+
+    if [ $exit_code -eq 23 ]; then
+        echo -e "${YELLOW}⚠ Some files were skipped:${NC}" >&2
+        echo "$output" | grep -E '^rsync:|permission denied|vanished|failed' | head -10 >&2
+    fi
+    return 0
+}
+
+# Run real rsync with live progress + final summary.
+# Args: SRC DST LABEL
+do_transfer() {
+    local src="$1" dst="$2" label="$3"
+    echo -e "${BLUE}${label}...${NC}"
+    rsync -ah --info=progress2 --info=name0 "${RSYNC_FILTER[@]}" "$src" "$dst"
+    local exit_code=$?
     if [ $exit_code -ne 0 ]; then
-        echo -e "${RED}✗ Error (exit code $exit_code):${NC}"
-        echo "$output"
+        echo -e "${RED}✗ Error (exit code $exit_code)${NC}"
         exit $exit_code
     fi
-    echo "$output"
-    return 0
+    echo -e "${GREEN}✓ Sync complete${NC}"
 }
 
 # Parse depth for status command
@@ -70,131 +154,19 @@ case "$1" in
             echo -e "${YELLOW}  If this is intentional, remove this check or use rsync manually.${NC}"
             exit 1
         fi
-        echo -e "${GREEN}✓ Server has $file_count files. Proceeding...${NC}"
-        echo -e "${BLUE}Pulling from server...${NC}"
-        run_rsync rsync -avz --progress --delete --filter=':- .gitignore' \
-            -e "$SSH_CMD" \
-            "gitsync@$SERVER:." "$LOCAL_PATH/"
-        echo -e "${GREEN}✓ Sync complete${NC}"
+        echo -e "${GREEN}✓ Server has $file_count files${NC}"
+        diff_summary "gitsync@$SERVER:." "$LOCAL_PATH/" "$DEPTH"
+        echo
+        do_transfer "gitsync@$SERVER:." "$LOCAL_PATH/" "Pulling from server"
         ;;
     up|push)
-        echo -e "${BLUE}Pushing to server...${NC}"
-        run_rsync rsync -avz --progress --delete --filter=':- .gitignore' \
-            -e "$SSH_CMD" \
-            "$LOCAL_PATH/" "gitsync@$SERVER:."
-        echo -e "${GREEN}✓ Sync complete${NC}"
+        diff_summary "$LOCAL_PATH/" "gitsync@$SERVER:." "$DEPTH"
+        echo
+        do_transfer "$LOCAL_PATH/" "gitsync@$SERVER:." "Pushing to server"
         ;;
     status)
         echo -e "${BLUE}[DRY-RUN] Comparing local vs server...${NC}"
-        output=$(rsync -rin --delete --filter=':- .gitignore' \
-            -e "$SSH_CMD" \
-            "$LOCAL_PATH/" "gitsync@$SERVER:." 2>&1)
-        exit_code=$?
-        # Code 23 = partial transfer (some files skipped) - treat as warning
-        if [ $exit_code -ne 0 ] && [ $exit_code -ne 23 ]; then
-            echo -e "${RED}✗ Connection failed (exit code $exit_code):${NC}"
-            echo "$output"
-            exit $exit_code
-        fi
-        echo -e "${GREEN}✓ Connected to $SERVER:$PORT${NC}"
-
-        # Parse rsync itemize output and group by directory
-        declare -A added modified deleted
-        total_added=0
-        total_modified=0
-        total_deleted=0
-
-        while IFS= read -r line; do
-            [[ -z "$line" ]] && continue
-            # rsync -i format: YXcstpoguax path
-            # Y: update type (< sent, > received, c local change, h hard link, . no update, * message)
-            # X: file type (f file, d directory, L symlink, etc)
-            flags="${line:0:11}"
-            path="${line:12}"
-
-            # Skip empty paths and root
-            [[ -z "$path" || "$path" == "./" ]] && continue
-
-            # Determine change type
-            change_type=""
-            if [[ "$line" == *deleting* ]]; then
-                change_type="deleted"
-            elif [[ "${flags:0:1}" == ">" || "${flags:0:1}" == "c" ]]; then
-                # Check if it's a new file (all flags set) or modification
-                if [[ "${flags:2:1}" == "+" ]]; then
-                    change_type="added"
-                else
-                    change_type="modified"
-                fi
-            elif [[ "${flags:0:1}" == "<" ]]; then
-                change_type="modified"
-            fi
-
-            [[ -z "$change_type" ]] && continue
-
-            # Skip directories themselves, only count files
-            [[ "$path" == */ ]] && continue
-
-            # Get directory at specified depth
-            dir=$(echo "$path" | cut -d'/' -f1-"$DEPTH")
-            # If the path has more components than depth, add trailing /
-            if [[ $(echo "$path" | tr -cd '/' | wc -c) -ge $DEPTH ]]; then
-                dir="$dir/"
-            fi
-
-            # Count by type and directory
-            case "$change_type" in
-                added)
-                    ((added["$dir"]++))
-                    ((total_added++))
-                    ;;
-                modified)
-                    ((modified["$dir"]++))
-                    ((total_modified++))
-                    ;;
-                deleted)
-                    ((deleted["$dir"]++))
-                    ((total_deleted++))
-                    ;;
-            esac
-        done <<< "$output"
-
-        total=$((total_added + total_modified + total_deleted))
-
-        if [ $total -eq 0 ]; then
-            echo -e "${GREEN}✓ No differences found.${NC}"
-        else
-            echo ""
-            # Collect all unique directories
-            declare -A all_dirs
-            for dir in "${!added[@]}"; do all_dirs["$dir"]=1; done
-            for dir in "${!modified[@]}"; do all_dirs["$dir"]=1; done
-            for dir in "${!deleted[@]}"; do all_dirs["$dir"]=1; done
-
-            # Print grouped by directory
-            for dir in $(echo "${!all_dirs[@]}" | tr ' ' '\n' | sort); do
-                a=${added["$dir"]:-0}
-                m=${modified["$dir"]:-0}
-                d=${deleted["$dir"]:-0}
-
-                # Build change indicator
-                indicator=""
-                [[ $a -gt 0 ]] && indicator="${indicator}${GREEN}+$a${NC} "
-                [[ $m -gt 0 ]] && indicator="${indicator}${YELLOW}~$m${NC} "
-                [[ $d -gt 0 ]] && indicator="${indicator}${RED}-$d${NC} "
-
-                printf "  %-40s %b\n" "$dir" "$indicator"
-            done
-
-            echo ""
-            echo -e "Summary: ${GREEN}+$total_added${NC} ${YELLOW}~$total_modified${NC} ${RED}-$total_deleted${NC} ($total files)"
-            echo -e "${YELLOW}Run 'gitsync up' to push these changes${NC}"
-        fi
-
-        if [ $exit_code -eq 23 ]; then
-            echo -e "${YELLOW}⚠ Warning: some files were skipped:${NC}"
-            echo "$output" | grep -E '^rsync:|permission denied|vanished|failed' | head -10
-        fi
+        diff_summary "$LOCAL_PATH/" "gitsync@$SERVER:." "$DEPTH"
         ;;
     *)
         echo "Usage: gitsync [down|up|status] [options]"

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Pick a power profile via rofi.
+
+set -e
+
+current=$(powerprofilesctl get)
+profiles=$(powerprofilesctl list | awk '/^[* ]+[a-z-]+:/ {gsub(/[*: ]/, ""); print}')
+
+choice=$(printf '%s\n' "$profiles" \
+  | awk -v cur="$current" '{ printf "%s%s\n", ($0==cur ? "● " : "  "), $0 }' \
+  | rofi -dmenu -i -p "Power profile" -no-custom \
+  | sed 's/^[● ] *//')
+
+[ -n "$choice" ] && [ "$choice" != "$current" ] && powerprofilesctl set "$choice"

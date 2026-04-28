@@ -26,4 +26,9 @@ AREA_H=$(( SIZE * ROWS + GAP * (ROWS - 1) ))
 L=$(( (W - AREA_W) / 2 ))
 T=$(( (H - AREA_H) / 2 ))
 
-exec wlogout -n -P "$IDX" -b "$COLS" -c "$GAP" -r "$GAP" -T "$T" -B "$T" -L "$L" -R "$L"
+CSS_SRC="${XDG_CONFIG_HOME:-$HOME/.config}/wlogout/style.css"
+CSS_TMP=$(mktemp --suffix=.css)
+trap 'rm -f "$CSS_TMP"' EXIT
+{ cat "$CSS_SRC"; printf '\nbutton { min-width: %dpx; min-height: %dpx; padding: 0; }\n' "$SIZE" "$SIZE"; } > "$CSS_TMP"
+
+exec wlogout -n -P "$IDX" -C "$CSS_TMP" -b "$COLS" -c "$GAP" -r "$GAP" -T "$T" -B "$T" -L "$L" -R "$L"

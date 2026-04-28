@@ -13,7 +13,7 @@ button {
   color: #ebdbb2;
   background-color: #282828;
   border-radius: 8px;
-  border: 2px solid #504945;
+  border: none;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 40%;
@@ -21,7 +21,6 @@ button {
 
 button:hover {
   background-color: #3c3836;
-  border-color: #d4a0b9;
   color: #d4a0b9;
 }
 

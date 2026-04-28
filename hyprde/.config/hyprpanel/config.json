@@ -137,6 +137,7 @@
         "media",
         "volume",
         "network",
+        "battery",
         "systray",
         "notifications"
       ]
@@ -193,5 +194,8 @@
   ],
   "bar.customModules.storage.paths": [
     "/"
-  ]
+  ],
+  "theme.bar.buttons.battery.text": "#ebdbb2",
+  "theme.bar.buttons.battery.icon": "#d4a0b9",
+  "bar.battery.hideBattery": false
 }

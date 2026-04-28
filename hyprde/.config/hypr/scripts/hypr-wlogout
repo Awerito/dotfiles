@@ -9,7 +9,7 @@ if pgrep -x wlogout >/dev/null; then
   exit 0
 fi
 
-read -r W H < <(hyprctl monitors -j | jq -r '.[] | select(.focused) | "\(.width) \(.height)"')
+read -r IDX W H < <(hyprctl monitors -j | jq -r 'to_entries[] | select(.value.focused) | "\(.key) \(.value.width) \(.value.height)"')
 
 LAYOUT="${XDG_CONFIG_HOME:-$HOME/.config}/wlogout/layout"
 N=$(grep -c '"label"' "$LAYOUT")
@@ -26,4 +26,4 @@ AREA_H=$(( SIZE * ROWS + GAP * (ROWS - 1) ))
 L=$(( (W - AREA_W) / 2 ))
 T=$(( (H - AREA_H) / 2 ))
 
-exec wlogout -b "$COLS" -c "$GAP" -r "$GAP" -T "$T" -B "$T" -L "$L" -R "$L"
+exec wlogout -n -P "$IDX" -b "$COLS" -c "$GAP" -r "$GAP" -T "$T" -B "$T" -L "$L" -R "$L"

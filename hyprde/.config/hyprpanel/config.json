@@ -32,10 +32,7 @@
     "hud_notifications": true
   },
   "icon_overrides": [],
-  "launch_wrapper": [
-    "sh",
-    "-c"
-  ],
+  "launch_wrapper": ["sh", "-c"],
   "theme.font.name": "MesloLGS Nerd Font Mono",
   "theme.font.label": "MesloLGS Nerd Font Mono",
   "theme.font.size": "13px",
@@ -119,27 +116,14 @@
   "theme.bar.menus.menu.clock.time.time": "#ebdbb2",
   "theme.bar.menus.menu.clock.time.timeperiod": "#a89984",
   "menus.media.preferredPlayer": "Spotify",
-  "menus.media.ignore": [
-    "Spotify"
-  ],
+  "menus.media.ignore": ["Spotify"],
   "menus.clock.weather.enabled": false,
   "theme.bar.menus.monochrome": true,
   "bar.layouts": {
     "*": {
-      "left": [
-        "workspaces",
-        "windowtitle"
-      ],
-      "middle": [
-        "clock"
-      ],
-      "right": [
-        "media",
-        "volume",
-        "network",
-        "systray",
-        "notifications"
-      ]
+      "left": ["workspaces", "windowtitle"],
+      "middle": ["clock"],
+      "right": ["media", "volume", "network", "systray", "notifications"]
     }
   },
   "bar.clock.format": "%a %d %b  %H:%M",
@@ -172,26 +156,36 @@
   "theme.bar.menus.menu.media.slider.primary": "#d4a0b9",
   "theme.bar.menus.menu.media.slider.background": "#3c3836",
   "theme.bar.menus.menu.media.slider.puck": "#ebdbb2",
+  "theme.bar.menus.menu.notifications.background": "#1d2021",
+  "theme.bar.menus.menu.notifications.card": "#282828",
+  "theme.bar.menus.menu.notifications.border": "#504945",
+  "theme.bar.menus.menu.notifications.label": "#d4a0b9",
+  "theme.bar.menus.menu.notifications.clear": "#d4a0b9",
+  "theme.bar.menus.menu.notifications.no_notifications_label": "#665c54",
+  "theme.bar.menus.menu.notifications.switch.enabled": "#d4a0b9",
+  "theme.bar.menus.menu.notifications.switch.disabled": "#504945",
+  "theme.bar.menus.menu.notifications.switch.puck": "#ebdbb2",
+  "theme.bar.menus.menu.notifications.switch_divider": "#504945",
+  "theme.bar.menus.menu.notifications.scrollbar.color": "#d4a0b9",
+  "theme.bar.menus.menu.notifications.pager.background": "#1d2021",
+  "theme.bar.menus.menu.notifications.pager.label": "#a89984",
+  "theme.bar.menus.menu.notifications.pager.button": "#d4a0b9",
+  "theme.notification.background": "#282828",
+  "theme.notification.border": "#504945",
+  "theme.notification.label": "#d4a0b9",
+  "theme.notification.labelicon": "#d4a0b9",
+  "theme.notification.text": "#ebdbb2",
+  "theme.notification.time": "#a89984",
+  "theme.notification.close_button.background": "#d4a0b9",
+  "theme.notification.close_button.label": "#1d2021",
+  "theme.notification.actions.background": "#d4a0b9",
+  "theme.notification.actions.text": "#1d2021",
   "bar.windowtitle.class_name": false,
   "bar.windowtitle.custom_title": true,
   "bar.windowtitle.title_map": [
-    [
-      "com.rtosta.zapzap",
-      "󰖣",
-      "WhatsApp"
-    ],
-    [
-      "brave-akpamiohjfcnimfljfndmaldlcfphjmp",
-      "󰋯",
-      "Instagram"
-    ],
-    [
-      "signal",
-      "󰭹",
-      "Signal"
-    ]
+    ["com.rtosta.zapzap", "󰖣", "WhatsApp"],
+    ["brave-akpamiohjfcnimfljfndmaldlcfphjmp", "󰋯", "Instagram"],
+    ["signal", "󰭹", "Signal"]
   ],
-  "bar.customModules.storage.paths": [
-    "/"
-  ]
+  "bar.customModules.storage.paths": ["/"]
 }

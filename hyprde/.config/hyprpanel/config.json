@@ -123,7 +123,14 @@
     "*": {
       "left": ["workspaces", "windowtitle"],
       "middle": ["clock"],
-      "right": ["media", "volume", "network", "systray", "notifications"]
+      "right": [
+        "media",
+        "volume",
+        "network",
+        "battery",
+        "systray",
+        "notifications"
+      ]
     }
   },
   "bar.clock.format": "%a %d %b  %H:%M",
@@ -187,5 +194,8 @@
     ["brave-akpamiohjfcnimfljfndmaldlcfphjmp", "󰋯", "Instagram"],
     ["signal", "󰭹", "Signal"]
   ],
-  "bar.customModules.storage.paths": ["/"]
+  "bar.customModules.storage.paths": ["/"],
+  "theme.bar.buttons.battery.text": "#ebdbb2",
+  "theme.bar.buttons.battery.icon": "#d4a0b9",
+  "bar.battery.hideBattery": false
 }

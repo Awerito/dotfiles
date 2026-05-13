@@ -146,19 +146,9 @@
   "bar.workspaces.numbered_active_indicator": "highlight",
   "bar.workspaces.show_numbered": false,
   "bar.workspaces.workspaces": 5,
-  "bar.workspaces.ignored": "",
+  "bar.workspaces.ignored": "^-",
   "bar.workspaces.monitorSpecific": false,
   "bar.workspaces.showWsIcons": true,
-  "bar.workspaces.workspaceIconMap": {
-    "-98": {
-      "icon": "",
-      "color": "#d4a0b9"
-    },
-    "-97": {
-      "icon": "",
-      "color": "#d4a0b9"
-    }
-  },
   "bar.network.showWifiInfo": true,
   "bar.media.show_active_only": true,
   "theme.bar.menus.menu.media.background.color": "#1d2021",
@@ -217,6 +207,11 @@
       "signal",
       "󰭹",
       "Signal"
+    ],
+    [
+      "pipterm",
+      "󰆍",
+      "Terminal"
     ]
   ],
   "bar.customModules.storage.paths": [

@@ -84,11 +84,11 @@ done
 # ============================================
 # HYPRLAND PLUGINS
 # ============================================
-echo "Installing Hyprland plugins..."
-hyprpm update
-hyprpm -s add https://github.com/aserper/hyprland-plugins c7aabf561f370cc59d272933b43aec048fb9b952
-hyprpm enable hyprexpo
-hyprpm reload
+# echo "Installing Hyprland plugins..."
+# hyprpm update
+# hyprpm -s add https://github.com/aserper/hyprland-plugins c7aabf561f370cc59d272933b43aec048fb9b952
+# hyprpm enable hyprexpo
+# hyprpm reload
 
 # ============================================
 # YAZI PLUGINS

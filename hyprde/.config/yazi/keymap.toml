@@ -22,3 +22,18 @@ desc = "Smart filter"
 on   = ["c", "m"]
 run  = "plugin chmod"
 desc = "Chmod"
+
+[[mgr.prepend_keymap]]
+on   = ["M", "p"]
+run  = ['shell "rmount phone" --block', 'cd ~/mnt/phone']
+desc = "Mount + open phone (FTP)"
+
+[[mgr.prepend_keymap]]
+on   = ["M", "b"]
+run  = ['shell "rmount bioceanor" --block', 'cd ~/mnt/bioceanor']
+desc = "Mount + open bioceanor (SFTP)"
+
+[[mgr.prepend_keymap]]
+on   = ["M", "u"]
+run  = 'shell "rmount -u phone; rmount -u bioceanor" --block'
+desc = "Unmount all rclone remotes"

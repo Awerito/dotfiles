@@ -1,0 +1,22 @@
+#!/bin/bash
+# Toggle Steam in the special:steam workspace.
+
+find_steam() {
+    hyprctl clients -j | jq -r '[.[] | select(.class=="steam") | .address] | first // empty'
+}
+
+address=$(find_steam)
+
+if [ -n "$address" ]; then
+    hyprctl dispatch togglespecialworkspace steam
+    exit 0
+fi
+
+steam &disown
+
+while [ -z "$address" ]; do
+    sleep 0.1
+    address=$(find_steam)
+done
+
+hyprctl dispatch focuswindow "address:$address"

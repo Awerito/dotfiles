@@ -18,6 +18,13 @@ return {
             json = { "prettier" },
             yaml = { "prettier" },
             go = { "gofmt" },
+            sql = { "sqlfluff" },
+        },
+        formatters = {
+            sqlfluff = {
+                -- sqlfluff exits 1 on unfixable lint but still formats; keep output.
+                exit_codes = { 0, 1 },
+            },
         },
     },
 }

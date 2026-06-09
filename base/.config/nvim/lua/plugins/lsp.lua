@@ -99,6 +99,7 @@ return {
             "black",
             "stylua",
             "prettier",
+            "sqlfluff",
             -- Treesitter
             "tree-sitter-cli",
         }

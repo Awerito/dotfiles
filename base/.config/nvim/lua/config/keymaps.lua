@@ -46,4 +46,4 @@ vim.keymap.set("i", "<C-f>", "<C-g>u<Esc>[s1z=`]a<C-g>u", { desc = "Fix last mis
 
 -- Markdown
 vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreview<CR>", { desc = "[M]arkdown [P]review" })
-vim.keymap.set("v", "<leader>mt", "<cmd>'<,'>! tr -s ' ' | column -t -s '|' -o '|'<CR>", { desc = "[M]arkdown [T]able" })
+vim.keymap.set("v", "<leader>mt", ":! tr -s ' ' | column -t -s '|' -o '|'<CR>", { desc = "[M]arkdown [T]able" })

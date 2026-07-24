@@ -1,3 +1,11 @@
+[plugin]
+prepend_previewers = [
+	{ url = "*.{arw,cr2,cr3,nef,dng,raf,rw2,orf,srw}", run = "magick" },
+]
+prepend_preloaders = [
+	{ url = "*.{arw,cr2,cr3,nef,dng,raf,rw2,orf,srw}", run = "magick" },
+]
+
 [[plugin.prepend_fetchers]]
 id    = "git"
 url   = "*"
@@ -9,3 +17,7 @@ id    = "git"
 url   = "*/"
 run   = "git"
 group = "git"
+
+[tasks]
+# 1GiB: a full 24MP RAW decode exceeds ImageMagick's default cache budget.
+image_alloc = 1073741824

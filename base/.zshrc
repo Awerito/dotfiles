@@ -123,6 +123,8 @@ alias dps='docker ps --format=$DOCKER_FORMAT'
 alias jeliup='cd ~/.config/jellyfin && docker compose up -d && cd -'
 alias jelidown='cd ~/.config/jellyfin && docker compose down && cd -'
 
+alias usd='udisksctl unmount -b /dev/sdb1'
+
 # ============================================
 # PATH & EXTERNAL TOOLS
 # ============================================

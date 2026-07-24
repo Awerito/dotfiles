@@ -1,1 +1,13 @@
-{}
+{
+  "custom/removable": {
+    "icon": "⏏",
+    "label": "{}",
+    "tooltip": "Click to safely eject",
+    "execute": "ls /run/media/awe 2>/dev/null | paste -sd, -",
+    "interval": 5000,
+    "hideOnEmpty": true,
+    "actions": {
+      "onLeftClick": "udiskie-umount -a"
+    }
+  }
+}

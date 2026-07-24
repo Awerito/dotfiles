@@ -1,0 +1,4 @@
+notifications:
+  timeout: 2
+  device_added: false
+  device_removed: false

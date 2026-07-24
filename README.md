@@ -58,6 +58,7 @@ stow hyprde
 - pavucontrol
 - brightnessctl
 - gnome-keyring
+- udiskie
 - greetd-tuigreet
 - hyprswitch
 - wlogout

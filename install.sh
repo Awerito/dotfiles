@@ -48,6 +48,9 @@ HYPRDE_PACKAGES=(
   tesseract-data-eng
   tesseract-data-spa
 
+  # Automount
+  udiskie
+
   # Apps
   rofi
   rofimoji

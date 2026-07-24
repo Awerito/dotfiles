@@ -137,6 +137,7 @@
         "media",
         "volume",
         "network",
+        "custom/removable",
         "systray",
         "notifications"
       ]

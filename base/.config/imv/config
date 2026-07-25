@@ -1,2 +1,0 @@
-[binds]
-<Shift+W> = exec $HOME/.local/scripts/set-wallpaper.sh $imv_current_file

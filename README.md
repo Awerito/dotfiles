@@ -6,7 +6,7 @@ Personal configurations for a CachyOS (Arch-based) development environment.
 
 | Package | What it includes |
 |---------|-----------------|
-| `base` | zsh, nvim, kitty, fastfetch, stylua, imv, scripts |
+| `base` | zsh, nvim, kitty, fastfetch, stylua, swayimg, scripts |
 | `hyprde` | hyprland, hyprpanel, rofi, yazi |
 | `system` | greetd config (`/etc`, not stowable — copy manually) |
 

@@ -1,5 +1,5 @@
 [Added Associations]
-image/x-sony-arw=imv.desktop;RapidRAW.desktop;
+image/x-sony-arw=RapidRAW.desktop;
 
 [Default Applications]
 image/jpeg=swayimg.desktop

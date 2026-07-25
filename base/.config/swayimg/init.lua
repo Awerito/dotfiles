@@ -6,7 +6,7 @@ swayimg.enable_exif_orientation(true) -- auto-rotate by EXIF orientation
 swayimg.viewer.limit_preload(3)
 swayimg.viewer.limit_history(3)
 
--- Shooting metadata overlay (toggle with 't')
+-- Shooting metadata overlay (toggle with 'z')
 swayimg.viewer.set_text("topleft", {
     "{name}",
     "{meta.Exif.Image.Make} {meta.Exif.Image.Model}",
@@ -24,6 +24,30 @@ swayimg.viewer.on_key("h", function()
 end)
 swayimg.viewer.on_key("l", function()
     swayimg.viewer.switch_image("next")
+end)
+
+-- zoom centered on the window
+local function zoom(factor)
+    local wnd = swayimg.get_window_size()
+    swayimg.viewer.set_abs_scale(swayimg.viewer.get_scale() * factor, wnd.width / 2, wnd.height / 2)
+end
+swayimg.viewer.on_key("plus", function()
+    zoom(1.1)
+end)
+swayimg.viewer.on_key("equal", function()
+    zoom(1.1)
+end)
+swayimg.viewer.on_key("minus", function()
+    zoom(0.9)
+end)
+
+-- toggle shooting metadata overlay
+swayimg.viewer.on_key("z", function()
+    if swayimg.text.visible() then
+        swayimg.text.hide()
+    else
+        swayimg.text.show()
+    end
 end)
 
 -- set current image as wallpaper

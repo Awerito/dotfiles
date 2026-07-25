@@ -1,0 +1,14 @@
+[Added Associations]
+image/x-sony-arw=imv.desktop;RapidRAW.desktop;
+
+[Default Applications]
+image/jpeg=swayimg.desktop
+image/png=swayimg.desktop
+image/tiff=swayimg.desktop
+image/webp=swayimg.desktop
+image/gif=swayimg.desktop
+image/bmp=swayimg.desktop
+image/avif=swayimg.desktop
+image/heif=swayimg.desktop
+image/jxl=swayimg.desktop
+image/x-sony-arw=RapidRAW.desktop

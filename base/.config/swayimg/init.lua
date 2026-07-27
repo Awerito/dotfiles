@@ -1,10 +1,11 @@
 -- swayimg — managed via ~/.dotfiles (stow: base)
 
 swayimg.enable_exif_orientation(true) -- auto-rotate by EXIF orientation
+swayimg.imagelist.enable_adjacent(true) -- load the rest of the directory when opened with a single file
 
 -- Preload/cache so navigation is instant in both directions
-swayimg.viewer.limit_preload(3)
-swayimg.viewer.limit_history(3)
+swayimg.viewer.limit_preload(12)
+swayimg.viewer.limit_history(4)
 
 -- Shooting metadata overlay (toggle with 'z')
 swayimg.viewer.set_text("topleft", {
@@ -39,6 +40,17 @@ swayimg.viewer.on_key("equal", function()
 end)
 swayimg.viewer.on_key("minus", function()
     zoom(0.9)
+end)
+swayimg.viewer.on_key("k", function()
+    zoom(1.1)
+end)
+swayimg.viewer.on_key("j", function()
+    zoom(0.9)
+end)
+
+-- refit the image whenever the window is resized
+swayimg.on_window_resize(function()
+    swayimg.viewer.set_fix_scale("optimal")
 end)
 
 -- toggle shooting metadata overlay

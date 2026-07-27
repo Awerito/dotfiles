@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DST="${SONY_DST:-/mnt/Disco/Sony-camera}"
+SRC=/run/media/awe/SONY/DCIM
+
+[ -d "$SRC" ] || { echo "SD no conectada ($SRC)"; exit 1; }
+
+find "$SRC" -type f -iname '*.arw' -printf '%TY-%Tm-%Td\t%p\n' | \
+while IFS=$'\t' read -r date path; do
+  mkdir -p "$DST/$date"
+  cp -n "$path" "$DST/$date/" && echo "  $date/$(basename "$path")"
+done
+echo "Listo: ARW importados a $DST/<date>/"
+
+if [ "${1:-}" = "--clean" ]; then
+  find "$SRC" -type f -delete
+  echo "SD limpiada: $SRC vacío"
+fi

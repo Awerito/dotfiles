@@ -127,7 +127,7 @@ alias usd='udisksctl unmount -b /dev/sdb1'
 # ============================================
 # PATH & EXTERNAL TOOLS
 # ============================================
-export PATH=$PATH:$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin:$HOME/.local/scripts
+export PATH=$PATH:$HOME/.scripts:$HOME/.scripts.local:$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin:$HOME/.local/scripts
 
 # NVM (lazy load — loads on first use of nvm/node/npm/npx)
 export NVM_DIR="$HOME/.nvm"

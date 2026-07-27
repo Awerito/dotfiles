@@ -1,0 +1,94 @@
+#!/bin/bash
+# Merge a 3-shot exposure bracket into an HDR image via exposure fusion.
+# Usage: hdr <first-raw>        e.g. hdr ~/Pictures/DSC01823.ARW
+# Assumes the other two frames are the next two numbers (DSC01824, DSC01825).
+
+set -euo pipefail
+
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+RED='\033[0;31m'
+DIM='\033[2m'
+NC='\033[0m'
+
+if [ $# -ne 1 ]; then
+    echo "Usage: hdr <first-raw>"
+    echo ""
+    echo "  Merges <first-raw> and the next two numbered frames into"
+    echo "  <first-raw>_hdr.tif (16-bit master) and <first-raw>_hdr.jpg"
+    exit 1
+fi
+
+for cmd in dcraw_emu align_image_stack enfuse magick; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo -e "${RED}✗ Missing '$cmd'${NC}"
+        echo "  Install with: paru -S --needed libraw enblend-enfuse hugin imagemagick"
+        exit 1
+    fi
+done
+
+first="$1"
+if [ ! -f "$first" ]; then
+    echo -e "${RED}✗ Not found: $first${NC}"
+    exit 1
+fi
+
+dir=$(dirname "$first")
+base=$(basename "$first")
+ext="${base##*.}"
+stem="${base%.*}"
+
+num="${stem##*[!0-9]}"
+prefix="${stem%"$num"}"
+if [ -z "$num" ]; then
+    echo -e "${RED}✗ Filename has no trailing number: $base${NC}"
+    exit 1
+fi
+
+# Build the bracket: N, N+1, N+2 with the same zero padding.
+# 10# forces base-10 so a leading zero isn't read as octal.
+frames=()
+for i in 0 1 2; do
+    frame=$(printf '%s%0*d.%s' "$prefix" "${#num}" "$((10#$num + i))" "$ext")
+    if [ ! -f "$dir/$frame" ]; then
+        echo -e "${RED}✗ Bracket incomplete, missing: $dir/$frame${NC}"
+        exit 1
+    fi
+    frames+=("$dir/$frame")
+done
+
+out="$dir/${stem}_hdr"
+
+tmpdir=$(mktemp -d)
+trap 'rm -rf "$tmpdir"' EXIT
+
+# -W is critical: without it dcraw auto-brightens each frame independently,
+# which flattens the exposure differences and makes the fusion pointless.
+echo -e "${BLUE}Decoding 3 frames...${NC}"
+# LibRaw is OpenMP-threaded, so three unbounded decodes would oversubscribe the
+# cores; split the budget. Set it per-command, not exported: the later stages are
+# OpenMP too and must keep the whole machine.
+# wait per-PID, because a bare `wait` returns 0 and would hide a failed decode.
+cores=$(nproc)
+omp=$(( cores < 3 ? 1 : cores / 3 ))
+pids=()
+for i in 0 1 2; do
+    echo -e "  ${DIM}$(basename "${frames[$i]}")${NC}"
+    OMP_NUM_THREADS=$omp dcraw_emu -w -W -6 -T -q 3 -o 1 -Z - "${frames[$i]}" > "$tmpdir/$i.tiff" &
+    pids+=($!)
+done
+for pid in "${pids[@]}"; do
+    wait "$pid"
+done
+
+echo -e "${BLUE}Aligning...${NC}"
+align_image_stack -m -C -a "$tmpdir/al_" "$tmpdir"/0.tiff "$tmpdir"/1.tiff "$tmpdir"/2.tiff
+
+echo -e "${BLUE}Fusing...${NC}"
+enfuse --output="$out.tif" --compression=DEFLATE "$tmpdir"/al_*.tif
+
+echo -e "${BLUE}Writing JPEG...${NC}"
+magick "$out.tif" -quality 95 "$out.jpg"
+
+echo -e "${GREEN}✓ $out.tif${NC}"
+echo -e "${GREEN}✓ $out.jpg${NC}"

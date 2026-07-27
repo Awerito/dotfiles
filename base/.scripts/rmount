@@ -1,0 +1,23 @@
+#!/bin/sh
+# rmount <name>     mount rclone remote at ~/mnt/<name>
+# rmount -u <name>  unmount
+#
+# Setup:
+#   sudo pacman -S rclone
+#   rclone config create <name> <ftp|sftp> host=H port=P user=U pass=P
+#
+# Creds live in ~/.config/rclone/rclone.conf (not in dotfiles).
+# Yazi keybinds: Mp / Mb / Mu
+set -e
+case "$1" in
+  -u)
+    shift
+    mountpoint -q "$HOME/mnt/$1" || exit 0
+    fusermount3 -u "$HOME/mnt/$1"
+    ;;
+  *)
+    mkdir -p "$HOME/mnt/$1"
+    mountpoint -q "$HOME/mnt/$1" && exit 0
+    rclone mount "$1:" "$HOME/mnt/$1" --vfs-cache-mode writes --daemon
+    ;;
+esac

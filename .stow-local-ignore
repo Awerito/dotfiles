@@ -22,7 +22,6 @@ _darcs
 ^/LICENSE.*
 ^/COPYING
 
-.local/bin/
 ^/scripts
 services
 .config/nvim/lazy-lock.json

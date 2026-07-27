@@ -2,13 +2,13 @@
 image/x-sony-arw=RapidRAW.desktop;
 
 [Default Applications]
-image/jpeg=swayimg.desktop
-image/png=swayimg.desktop
-image/tiff=swayimg.desktop
-image/webp=swayimg.desktop
-image/gif=swayimg.desktop
-image/bmp=swayimg.desktop
-image/avif=swayimg.desktop
-image/heif=swayimg.desktop
-image/jxl=swayimg.desktop
-image/x-sony-arw=RapidRAW.desktop
+image/jpeg=org.nomacs.ImageLounge.desktop
+image/png=org.nomacs.ImageLounge.desktop
+image/tiff=org.nomacs.ImageLounge.desktop
+image/webp=org.nomacs.ImageLounge.desktop
+image/gif=org.nomacs.ImageLounge.desktop
+image/bmp=org.nomacs.ImageLounge.desktop
+image/avif=org.nomacs.ImageLounge.desktop
+image/heif=org.nomacs.ImageLounge.desktop
+image/jxl=org.nomacs.ImageLounge.desktop
+image/x-sony-arw=org.nomacs.ImageLounge.desktop

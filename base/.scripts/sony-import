@@ -2,7 +2,9 @@
 set -euo pipefail
 
 DST="${SONY_DST:-/mnt/Disco/Sony-camera}"
-SRC=/run/media/awe/SONY/DCIM
+VDST="$(dirname "$DST")/Sony-videos"
+MOUNT=/run/media/awe/SONY
+SRC="$MOUNT/DCIM"
 
 [ -d "$SRC" ] || { echo "SD no conectada ($SRC)"; exit 1; }
 
@@ -13,7 +15,11 @@ while IFS=$'\t' read -r date path; do
 done
 echo "Listo: ARW importados a $DST/<date>/"
 
+mkdir -p "$VDST"
+find "$MOUNT" -type f -iname '*.mp4' -print -exec cp -n -t "$VDST" {} +
+echo "Listo: videos volcados a $VDST/"
+
 if [ "${1:-}" = "--clean" ]; then
-  find "$SRC" -type f -delete
-  echo "SD limpiada: $SRC vacío"
+  find "$MOUNT" -mindepth 1 -delete
+  echo "SD limpiada: $MOUNT vacío"
 fi

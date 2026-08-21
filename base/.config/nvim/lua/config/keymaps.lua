@@ -46,4 +46,18 @@ vim.keymap.set("i", "<C-f>", "<C-g>u<Esc>[s1z=`]a<C-g>u", { desc = "Fix last mis
 
 -- Markdown
 vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreview<CR>", { desc = "[M]arkdown [P]review" })
+vim.keymap.set("n", "<leader>mc", function()
+    local file = vim.api.nvim_buf_get_name(0)
+    local pdf = vim.fn.fnamemodify(file, ":r") .. ".pdf"
+    vim.notify("Compilando " .. vim.fn.fnamemodify(file, ":t") .. "...", vim.log.levels.INFO)
+    vim.system({ "pandoc", "-t", "beamer", "--pdf-engine=xelatex", file, "-o", pdf }, { cwd = vim.fn.fnamemodify(file, ":h") }, function(res)
+        vim.schedule(function()
+            if res.code == 0 then
+                vim.notify("PDF listo: " .. vim.fn.fnamemodify(pdf, ":t"), vim.log.levels.INFO)
+            else
+                vim.notify("pandoc falló:\n" .. (res.stderr or ""), vim.log.levels.ERROR)
+            end
+        end)
+    end)
+end, { desc = "[M]arkdown [C]ompile (pandoc beamer)" })
 vim.keymap.set("v", "<leader>mt", ":! tr -s ' ' | column -t -s '|' -o '|'<CR>", { desc = "[M]arkdown [T]able" })

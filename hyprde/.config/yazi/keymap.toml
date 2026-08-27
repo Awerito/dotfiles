@@ -25,12 +25,12 @@ desc = "Chmod"
 
 [[mgr.prepend_keymap]]
 on   = ["M", "p"]
-run  = ['shell "rmount phone" --block', 'cd ~/mnt/phone']
+run  = ['shell "rmount phone" --block', 'cd /mnt/phone']
 desc = "Mount + open phone (FTP)"
 
 [[mgr.prepend_keymap]]
 on   = ["M", "b"]
-run  = ['shell "rmount bioceanor" --block', 'cd ~/mnt/bioceanor']
+run  = ['shell "rmount bioceanor" --block', 'cd /mnt/bioceanor']
 desc = "Mount + open bioceanor (SFTP)"
 
 [[mgr.prepend_keymap]]

@@ -1,0 +1,12 @@
+#!/bin/bash
+# Move the active window to the adjacent monitor. Windows in a special
+# workspace stay there.
+# Usage: hypr-movetomonitor <l|d|u|r>
+
+direction="$1"
+
+workspace_name=$(hyprctl activewindow -j | jq -r '.workspace.name')
+
+[[ $workspace_name == special:* ]] && exit 0
+
+hyprctl dispatch movewindow "mon:$direction"

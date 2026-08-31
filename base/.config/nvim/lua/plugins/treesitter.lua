@@ -16,6 +16,8 @@ return {
             "python",
             "javascript",
             "typescript",
+            "latex",
+            "yaml",
         }
 
         local installed = require("nvim-treesitter").get_installed()

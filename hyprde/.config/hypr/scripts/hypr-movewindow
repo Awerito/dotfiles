@@ -7,7 +7,10 @@ direction="$1"
 
 # movewindow silently no-ops at the tree edge, so detect "didn't move" by
 # comparing position before and after.
-read -r x_before y_before < <(hyprctl activewindow -j | jq -r '"\(.at[0]) \(.at[1])"')
+read -r x_before y_before workspace_name < <(hyprctl activewindow -j | jq -r '"\(.at[0]) \(.at[1]) \(.workspace.name)"')
+
+# Special workspaces hold a single window; it must not leave them.
+[[ $workspace_name == special:* ]] && exit 0
 hyprctl dispatch movewindow "$direction"
 read -r x_after y_after current_workspace < <(hyprctl activewindow -j | jq -r '"\(.at[0]) \(.at[1]) \(.workspace.id)"')
 

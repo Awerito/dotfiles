@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Move windows spawned inside the pip terminal's special workspace onto the
-active normal workspace, so GUI windows don't get stuck behind the terminal."""
+"""Move windows spawned inside a pip special workspace onto the active normal
+workspace, so each pip workspace keeps only its own window."""
 import os, socket, subprocess, json
 
 his = os.environ["HYPRLAND_INSTANCE_SIGNATURE"]
 runtime = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
 sock_path = f"{runtime}/hypr/{his}/.socket2.sock"
+
+PIP_WORKSPACE_CLASSES = {"special:pip": "pipterm", "special:pipspoti": "Spotify"}
 
 conn = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 conn.connect(sock_path)
@@ -25,7 +27,7 @@ while True:
         if len(parts) < 3:
             continue
         address, workspace, wclass = parts[0], parts[1], parts[2]
-        if workspace != "special:pip" or wclass == "pipterm":
+        if PIP_WORKSPACE_CLASSES.get(workspace) in (None, wclass):
             continue
         monitors = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"]))
         target = next(m["activeWorkspace"]["id"] for m in monitors if m["focused"])

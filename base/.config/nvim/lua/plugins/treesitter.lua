@@ -16,6 +16,7 @@ return {
             "python",
             "javascript",
             "typescript",
+            "tsx",
             "latex",
             "yaml",
         }
@@ -29,8 +30,14 @@ return {
             require("nvim-treesitter").install(to_install)
         end
 
+        -- Filetypes whose names differ from the parser name
+        local filetypes = vim.list_extend(vim.deepcopy(parsers), {
+            "javascriptreact",
+            "typescriptreact",
+        })
+
         vim.api.nvim_create_autocmd("FileType", {
-            pattern = parsers,
+            pattern = filetypes,
             callback = function()
                 vim.treesitter.start()
             end,

@@ -22,5 +22,11 @@ vim.opt.scrolloff = 10
 vim.opt.hlsearch = true
 vim.opt.wrap = false
 
+-- Indentation: spaces, not tabs (vim-sleuth still adapts per file)
+vim.opt.expandtab = true
+vim.opt.shiftwidth = 2
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+
 -- Disable EditorConfig
 vim.g.editorconfig = false

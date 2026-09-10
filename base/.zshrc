@@ -129,11 +129,11 @@ alias usd='udisksctl unmount -b /dev/sdb1'
 # ============================================
 export PATH=$PATH:$HOME/.scripts:$HOME/.scripts.local:$HOME/.local/bin:/usr/local/bin:$HOME/.cargo/bin:$HOME/.local/scripts
 
-# NVM (lazy load — loads on first use of nvm/node/npm/npx)
+# NVM (lazy load — loads on first use of nvm/node/npm/npx/pnpm)
 export NVM_DIR="$HOME/.nvm"
 
 _nvm_load() {
-  unset -f nvm node npm npx _nvm_load
+  unset -f nvm node npm npx pnpm _nvm_load
   [ ! -d "$NVM_DIR" ] && mkdir -p "$NVM_DIR"
   if [ -s "$NVM_DIR/nvm.sh" ]; then
     \. "$NVM_DIR/nvm.sh"
@@ -147,6 +147,7 @@ nvm()  { _nvm_load; nvm "$@"; }
 node() { _nvm_load; node "$@"; }
 npm()  { _nvm_load; npm "$@"; }
 npx()  { _nvm_load; npx "$@"; }
+pnpm() { _nvm_load; pnpm "$@"; }
 
 # LaTeX
 export PATH="$PATH:/usr/local/texlive/2024/bin/x86_64-linux"

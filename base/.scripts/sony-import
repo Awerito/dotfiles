@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DST="${SONY_DST:-/mnt/Disco/Sony-camera}"
+DST="${SONY_DST:-$HOME/Pictures/Sony-camera}"
 VDST="$(dirname "$DST")/Sony-videos"
 MOUNT=/run/media/awe/SONY
 SRC="$MOUNT/DCIM"

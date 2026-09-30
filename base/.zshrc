@@ -132,8 +132,8 @@ export PATH=$PATH:$HOME/.scripts:$HOME/.scripts.local:$HOME/.local/bin:/usr/loca
 # NVM (lazy load — loads on first use of nvm/node/npm/npx/pnpm)
 export NVM_DIR="$HOME/.nvm"
 
-_nvm_load() {
-  unset -f nvm node npm npx pnpm _nvm_load
+nvm_lazy_load() {
+  unset -f nvm node npm npx pnpm nvm_lazy_load
   [ ! -d "$NVM_DIR" ] && mkdir -p "$NVM_DIR"
   if [ -s "$NVM_DIR/nvm.sh" ]; then
     \. "$NVM_DIR/nvm.sh"
@@ -143,11 +143,11 @@ _nvm_load() {
   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
   [ -s "/usr/share/nvm/bash_completion" ] && \. "/usr/share/nvm/bash_completion"
 }
-nvm()  { _nvm_load; nvm "$@"; }
-node() { _nvm_load; node "$@"; }
-npm()  { _nvm_load; npm "$@"; }
-npx()  { _nvm_load; npx "$@"; }
-pnpm() { _nvm_load; pnpm "$@"; }
+nvm()  { nvm_lazy_load; nvm "$@"; }
+node() { nvm_lazy_load; node "$@"; }
+npm()  { nvm_lazy_load; npm "$@"; }
+npx()  { nvm_lazy_load; npx "$@"; }
+pnpm() { nvm_lazy_load; pnpm "$@"; }
 
 # LaTeX
 export PATH="$PATH:/usr/local/texlive/2024/bin/x86_64-linux"

@@ -2,7 +2,10 @@
 on   = "W"
 run  = '''shell -- bash -c '
     IMAGE="$(realpath "%h")"
-    swww img "$IMAGE" --transition-type fade --transition-duration 1
+    dir="$HOME/.config/wallpaper-toggle"
+    slot="$dir/$([ -f "$dir/on_sfw" ] && echo sfw || echo normal)"
+    cp "$IMAGE" "$slot"
+    swww img "$slot" --transition-type fade --transition-duration 1
     notify-send "Wallpaper changed" "$(basename "$IMAGE")"
 ' '''
 desc = "Set image as wallpaper"

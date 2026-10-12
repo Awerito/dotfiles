@@ -1,12 +1,9 @@
 [[mgr.prepend_keymap]]
 on   = "W"
 run  = '''shell -- bash -c '
-    IMAGE="$(realpath "%h")"
-    dir="$HOME/.config/wallpaper-toggle"
-    slot="$dir/$([ -f "$dir/on_sfw" ] && echo sfw || echo normal)"
-    cp "$IMAGE" "$slot"
-    swww img "$slot" --transition-type fade --transition-duration 1
-    notify-send "Wallpaper changed" "$(basename "$IMAGE")"
+    cp "$(realpath "%h")" ~/.config/wallpaper-toggle/current
+    swww img ~/.config/wallpaper-toggle/current --transition-type fade --transition-duration 1
+    notify-send "Wallpaper changed" "$(basename "%h")"
 ' '''
 desc = "Set image as wallpaper"
 

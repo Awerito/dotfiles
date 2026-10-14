@@ -116,7 +116,7 @@
   "theme.bar.menus.menu.clock.time.time": "#ebdbb2",
   "theme.bar.menus.menu.clock.time.timeperiod": "#a89984",
   "menus.media.preferredPlayer": "spotifast",
-  "menus.media.ignore": ["spotifast"],
+  "menus.media.ignore": [],
   "menus.clock.weather.enabled": false,
   "theme.bar.menus.monochrome": true,
   "bar.layouts": {

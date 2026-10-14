@@ -1,8 +1,7 @@
 [[mgr.prepend_keymap]]
 on   = "W"
 run  = '''shell -- bash -c '
-    cp "$(realpath "%h")" ~/.config/wallpaper-toggle/current
-    swww img ~/.config/wallpaper-toggle/current --transition-type fade --transition-duration 1
+    cp "$(realpath "%h")" ~/.config/background
     notify-send "Wallpaper changed" "$(basename "%h")"
 ' '''
 desc = "Set image as wallpaper"

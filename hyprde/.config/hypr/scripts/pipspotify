@@ -2,7 +2,7 @@
 # Toggle Spotify in the special:pip workspace.
 
 find_spotify() {
-    hyprctl clients -j | jq -r '[.[] | select(.class=="Spotify") | .address] | first // empty'
+    hyprctl clients -j | jq -r '[.[] | select(.class=="spotifast") | .address] | first // empty'
 }
 
 address=$(find_spotify)
@@ -12,7 +12,7 @@ if [ -n "$address" ]; then
     exit 0
 fi
 
-spotify-launcher &disown
+spotifast &disown
 
 while [ -z "$address" ]; do
     sleep 0.1

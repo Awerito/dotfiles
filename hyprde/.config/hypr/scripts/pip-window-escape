@@ -7,7 +7,7 @@ his = os.environ["HYPRLAND_INSTANCE_SIGNATURE"]
 runtime = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
 sock_path = f"{runtime}/hypr/{his}/.socket2.sock"
 
-PIP_WORKSPACE_CLASSES = {"special:pip": "pipterm", "special:pipspoti": "Spotify"}
+PIP_WORKSPACE_CLASSES = {"special:pip": "pipterm", "special:pipspoti": "spotifast"}
 
 conn = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 conn.connect(sock_path)

@@ -32,7 +32,10 @@
     "hud_notifications": true
   },
   "icon_overrides": [],
-  "launch_wrapper": ["sh", "-c"],
+  "launch_wrapper": [
+    "sh",
+    "-c"
+  ],
   "theme.font.name": "MesloLGS Nerd Font Mono",
   "theme.font.label": "MesloLGS Nerd Font Mono",
   "theme.font.size": "13px",
@@ -121,8 +124,13 @@
   "theme.bar.menus.monochrome": true,
   "bar.layouts": {
     "*": {
-      "left": ["workspaces", "windowtitle"],
-      "middle": ["clock"],
+      "left": [
+        "workspaces",
+        "windowtitle"
+      ],
+      "middle": [
+        "clock"
+      ],
       "right": [
         "media",
         "volume",
@@ -184,10 +192,28 @@
   "bar.windowtitle.class_name": false,
   "bar.windowtitle.custom_title": true,
   "bar.windowtitle.title_map": [
-    ["com.rtosta.zapzap", "󰖣", "WhatsApp"],
-    ["brave-akpamiohjfcnimfljfndmaldlcfphjmp", "󰋯", "Instagram"],
-    ["signal", "󰭹", "Signal"],
-    ["pipterm", "󰆍", "Terminal"]
+    [
+      "com.rtosta.zapzap",
+      "󰖣",
+      "WhatsApp"
+    ],
+    [
+      "brave-akpamiohjfcnimfljfndmaldlcfphjmp",
+      "󰋯",
+      "Instagram"
+    ],
+    [
+      "signal",
+      "󰭹",
+      "Signal"
+    ],
+    [
+      "pipterm",
+      "󰆍",
+      "Terminal"
+    ]
   ],
-  "bar.customModules.storage.paths": ["/"]
+  "bar.customModules.storage.paths": [
+    "/"
+  ]
 }

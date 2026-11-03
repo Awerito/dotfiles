@@ -1,0 +1,4 @@
+[Thumbnailer Entry]
+TryExec=exiftool
+Exec=sh -c 'exiftool -b -PreviewImage "$1" > "$2"' sh %i %o
+MimeType=image/x-sony-arw;image/x-canon-cr2;image/x-canon-cr3;image/x-nikon-nef;image/x-adobe-dng;image/x-fuji-raf;image/x-olympus-orf;image/x-panasonic-rw2;image/x-pentax-pef;

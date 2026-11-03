@@ -31,5 +31,5 @@ while True:
             continue
         monitors = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"]))
         target = next(m["activeWorkspace"]["id"] for m in monitors if m["focused"])
-        subprocess.run(["hyprctl", "dispatch", "movetoworkspacesilent",
-                        f"{target},address:0x{address}"])
+        subprocess.run(["hyprctl", "dispatch",
+                        f'hl.dsp.window.move({{ window = "address:0x{address}", workspace = {target}, follow = false }})'])

@@ -11,12 +11,12 @@ read -r x_before y_before workspace_name < <(hyprctl activewindow -j | jq -r '"\
 
 # Special workspaces hold a single window; it must not leave them.
 [[ $workspace_name == special:* ]] && exit 0
-hyprctl dispatch movewindow "$direction"
+hyprctl dispatch "hl.dsp.window.move({ direction = \"$direction\" })"
 read -r x_after y_after current_workspace < <(hyprctl activewindow -j | jq -r '"\(.at[0]) \(.at[1]) \(.workspace.id)"')
 
 if [ "$x_before" = "$x_after" ] && [ "$y_before" = "$y_after" ]; then
     case "$direction" in
-        l) [ "$current_workspace" -gt 1 ] && hyprctl dispatch movetoworkspace -1 ;;
-        r) [ "$current_workspace" -lt 5 ] && hyprctl dispatch movetoworkspace +1 ;;
+        l) [ "$current_workspace" -gt 1 ] && hyprctl dispatch 'hl.dsp.window.move({ workspace = "-1", follow = true })' ;;
+        r) [ "$current_workspace" -lt 5 ] && hyprctl dispatch 'hl.dsp.window.move({ workspace = "+1", follow = true })' ;;
     esac
 fi

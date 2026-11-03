@@ -51,16 +51,16 @@ read -r pair_a pair_b single pair_stacked <<< "$(echo "$clients" | jq -r '
 
 # Normalize: all three windows end up on the same row.
 if [ "$pair_stacked" = "true" ]; then
-    hyprctl dispatch focuswindow "address:$pair_a" >/dev/null
-    hyprctl dispatch layoutmsg togglesplit >/dev/null
+    hyprctl dispatch "hl.dsp.focus({ window = \"address:$pair_a\" })" >/dev/null
+    hyprctl dispatch 'hl.dsp.layout("togglesplit")' >/dev/null
     wait_same_y "$pair_a" "$pair_b"
 fi
 
 single_y=$(hyprctl -j clients | jq -r --arg s "$single" '.[]|select(.address==$s)|.at[1]')
 pair_y=$(hyprctl -j clients | jq -r --arg a "$pair_a" '.[]|select(.address==$a)|.at[1]')
 if [ "$single_y" != "$pair_y" ]; then
-    hyprctl dispatch focuswindow "address:$single" >/dev/null
-    hyprctl dispatch layoutmsg togglesplit >/dev/null
+    hyprctl dispatch "hl.dsp.focus({ window = \"address:$single\" })" >/dev/null
+    hyprctl dispatch 'hl.dsp.layout("togglesplit")' >/dev/null
     wait_same_y "$single" "$pair_a"
 fi
 
@@ -97,8 +97,8 @@ while [ "$attempts" -gt 0 ]; do
     else
         delta=$(( current - column_width ))
     fi
-    hyprctl dispatch focuswindow "address:$off_addr" >/dev/null
-    hyprctl dispatch resizeactive "$delta" 0 >/dev/null
+    hyprctl dispatch "hl.dsp.focus({ window = \"address:$off_addr\" })" >/dev/null
+    hyprctl dispatch "hl.dsp.window.resize({ x = $delta, y = 0, relative = true })" >/dev/null
     sleep 0.1
     attempts=$((attempts - 1))
 done

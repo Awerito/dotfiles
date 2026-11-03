@@ -8,7 +8,7 @@ find_terminal() {
 address=$(find_terminal)
 
 if [ -n "$address" ]; then
-    hyprctl dispatch togglespecialworkspace pip
+    hyprctl dispatch 'hl.dsp.workspace.toggle_special("pip")'
     exit 0
 fi
 
@@ -21,6 +21,6 @@ done
 
 read -r monitor_width monitor_height < <(hyprctl monitors -j | jq -r '.[] | select(.focused) | "\(.width) \(.height)"')
 
-hyprctl dispatch resizewindowpixel "exact $((monitor_width * 60 / 100)) $((monitor_height * 60 / 100)),address:$address"
-hyprctl dispatch focuswindow "address:$address"
-hyprctl dispatch centerwindow
+hyprctl dispatch "hl.dsp.window.resize({ window = \"address:$address\", x = $((monitor_width * 60 / 100)), y = $((monitor_height * 60 / 100)), relative = false })"
+hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })"
+hyprctl dispatch 'hl.dsp.window.center()'

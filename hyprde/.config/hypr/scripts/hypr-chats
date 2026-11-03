@@ -11,8 +11,8 @@ wait_for_window() {
 }
 
 split_from() {
-    hyprctl dispatch focuswindow "class:$1" >/dev/null
-    hyprctl dispatch layoutmsg preselect "$2" >/dev/null
+    hyprctl dispatch "hl.dsp.focus({ window = \"class:$1\" })" >/dev/null
+    hyprctl dispatch "hl.dsp.layout(\"preselect $2\")" >/dev/null
 }
 
 # Target layout:
@@ -20,7 +20,7 @@ split_from() {
 #   bottom row: Brave  | ZapZap
 BRAVE=brave-akpamiohjfcnimfljfndmaldlcfphjmp-Default
 
-hyprctl dispatch workspace 1
+hyprctl dispatch 'hl.dsp.focus({ workspace = 1 })'
 
 slack &disown
 wait_for_window Slack

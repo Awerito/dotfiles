@@ -1,9 +1,9 @@
 [[mgr.prepend_keymap]]
 on   = "W"
-run  = '''shell -- bash -c '
-    cp "$(realpath "%h")" ~/.config/background
-    notify-send "Wallpaper changed" "$(basename "%h")"
-' '''
+run  = '''shell --
+    cp %h ~/.config/background
+    notify-send "Wallpaper changed" "$(basename %h)"
+'''
 desc = "Set image as wallpaper"
 
 [[mgr.prepend_keymap]]

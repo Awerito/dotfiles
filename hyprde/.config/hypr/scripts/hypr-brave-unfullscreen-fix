@@ -19,4 +19,4 @@ for event_line in event_socket.makefile("r"):
         continue
     active_window = json.loads(subprocess.check_output(["hyprctl", "-j", "activewindow"]))
     if active_window.get("class") == "brave-browser" and (active_window.get("fullscreen") or active_window.get("fullscreenClient")):
-        subprocess.run(["hyprctl", "dispatch", "fullscreenstate", "0", "0"], check=False)
+        subprocess.run(["hyprctl", "dispatch", "hl.dsp.window.fullscreen_state({ internal = 0, client = 0 })"], check=False)

@@ -9,8 +9,8 @@ current_workspace=$(hyprctl activeworkspace -j | jq '.id')
 
 switch_workspace_at_edge() {
     case "$direction" in
-        l) [ "$current_workspace" -gt 1 ] && hyprctl dispatch workspace -1 ;;
-        r) [ "$current_workspace" -lt 5 ] && hyprctl dispatch workspace +1 ;;
+        l) [ "$current_workspace" -gt 1 ] && hyprctl dispatch 'hl.dsp.focus({ workspace = "-1" })' ;;
+        r) [ "$current_workspace" -lt 5 ] && hyprctl dispatch 'hl.dsp.focus({ workspace = "+1" })' ;;
     esac
 }
 
@@ -55,7 +55,7 @@ if [ "$active_workspace" = "$current_workspace" ] && [ "$active_floating" = "fal
 fi
 
 if [ -n "$neighbor_address" ]; then
-    hyprctl dispatch focuswindow "address:$neighbor_address"
+    hyprctl dispatch "hl.dsp.focus({ window = \"address:$neighbor_address\" })"
 else
     switch_workspace_at_edge
 fi

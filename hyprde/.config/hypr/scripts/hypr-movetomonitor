@@ -9,4 +9,4 @@ workspace_name=$(hyprctl activewindow -j | jq -r '.workspace.name')
 
 [[ $workspace_name == special:* ]] && exit 0
 
-hyprctl dispatch movewindow "mon:$direction"
+hyprctl dispatch "hl.dsp.window.move({ monitor = \"$direction\", follow = true })"

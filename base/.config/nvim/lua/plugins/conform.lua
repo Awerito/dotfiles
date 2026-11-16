@@ -7,7 +7,7 @@ return {
             lsp_format = "fallback",
         },
         formatters_by_ft = {
-            python = { "black" },
+            python = { "ruff_format" },
             lua = { "stylua" },
             javascript = { "prettier" },
             javascriptreact = { "prettier" },

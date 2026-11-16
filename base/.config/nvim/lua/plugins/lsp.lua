@@ -70,6 +70,7 @@ return {
                     },
                 },
             },
+            ruff = {},
             ts_ls = {},
             gopls = {},
             html = {},
@@ -86,6 +87,7 @@ return {
         local ensure_installed = {
             -- LSPs
             "pyright",
+            "ruff",
             "lua_ls",
             "ts_ls",
             "gopls",
@@ -96,7 +98,6 @@ return {
             "dockerls",
             "docker_compose_language_service",
             -- Formatters
-            "black",
             "stylua",
             "prettier",
             "sqlfluff",

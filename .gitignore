@@ -2,3 +2,6 @@ base/.config/nvim/lazy-lock.json
 hyprde/.config/yazi/plugins/
 hyprde/.config/yazi/flavors/
 hyprde/.config/yazi/package.toml
+hyprde/.config/wayle/schema.json
+hyprde/.config/wayle/config.toml.example
+hyprde/.config/wayle/themes/

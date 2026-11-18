@@ -1,0 +1,99 @@
+[general]
+font-sans = "MesloLGS Nerd Font Mono"
+font-mono = "MesloLGS Nerd Font Mono"
+
+[styling.palette]
+bg = "#1d2021"
+surface = "#282828"
+elevated = "#3c3836"
+fg = "#ebdbb2"
+fg-muted = "#a89984"
+primary = "#d4a0b9"
+red = "#fb4934"
+yellow = "#fabd2f"
+green = "#b8bb26"
+blue = "#83a598"
+
+[bar]
+location = "top"
+inset-edge = 0.2
+inset-ends = 0.2
+rounding = "sm"
+padding = 0.225
+padding-ends = 1.5
+bg = "#1d2021"
+background-opacity = 85
+button-variant = "basic"
+button-bg-opacity = 0
+
+[[bar.layout]]
+monitor = "*"
+left = ["hyprland-workspaces", "window-title"]
+center = ["clock"]
+right = ["media", "volume", "network", "custom-removable", "systray", "notifications"]
+
+[modules.hyprland-workspaces]
+min-workspace-count = 5
+monitor-specific = false
+show-special = false
+display-mode = "label"
+active-indicator = "background"
+active-color = "accent"
+occupied-color = "fg-muted"
+empty-color = "#504945"
+container-bg-color = "transparent"
+
+[modules.window-title]
+format = "{{ title }}"
+icon-color = "accent"
+label-color = "fg-default"
+button-bg-color = "transparent"
+
+# si-* icons: wayle icons install simple-icons whatsapp instagram signal
+[modules.window-title.icon-mappings]
+"com.rtosta.zapzap" = "si-whatsapp-symbolic"
+"brave-akpamiohjfcnimfljfndmaldlcfphjmp" = "si-instagram-symbolic"
+"signal" = "si-signal-symbolic"
+"pipterm" = "ld-terminal-symbolic"
+
+[modules.clock]
+format = "%a %d %b  %H:%M"
+icon-color = "accent"
+label-color = "fg-default"
+button-bg-color = "transparent"
+right-click = ""
+
+[modules.media]
+player-priority = ["*spotifast*"]
+format = "{{ artist }} - {{ title }}"
+icon-color = "accent"
+label-color = "fg-default"
+button-bg-color = "transparent"
+
+[modules.volume]
+icon-color = "accent"
+label-color = "fg-default"
+button-bg-color = "transparent"
+
+[modules.network]
+icon-color = "accent"
+label-color = "fg-default"
+button-bg-color = "transparent"
+
+[modules.notifications]
+label-show = false
+icon-color = "accent"
+label-color = "fg-default"
+button-bg-color = "transparent"
+
+[[modules.custom]]
+id = "removable"
+command = "ls /run/media/awe 2>/dev/null | paste -sd, -"
+interval-ms = 5000
+hide-if-empty = true
+format = "⏏ {{ output }}"
+tooltip-format = "Click to safely eject"
+icon-show = false
+label-color = "fg-default"
+button-bg-color = "transparent"
+left-click = "udiskie-umount -a"

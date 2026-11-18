@@ -28,7 +28,7 @@ HYPRDE_PACKAGES=(
   hyprpolkitagent
   hyprpicker
   hypridle
-  ags-hyprpanel-git
+  wayle-bin
   xdg-desktop-portal-hyprland
   xorg-xwayland
 
@@ -103,6 +103,12 @@ ya pkg add yazi-rs/plugins:jump-to-char
 ya pkg add yazi-rs/plugins:smart-filter
 ya pkg add yazi-rs/plugins:chmod
 ya pkg add yazi-rs/plugins:git
+
+# ============================================
+# WAYLE ICONS
+# ============================================
+echo "Installing wayle icons..."
+wayle icons install simple-icons whatsapp instagram signal
 
 # ============================================
 # DEFAULT SHELL

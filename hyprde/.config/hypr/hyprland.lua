@@ -10,7 +10,7 @@ hl.env("LC_TIME", "en_GB.UTF-8")
 hl.on("hyprland.start", function()
     hl.exec_cmd("hyprlock --grace 0")
     hl.exec_cmd("hypridle")
-    hl.exec_cmd("hyprpanel")
+    hl.exec_cmd("wayle panel start")
     hl.exec_cmd("swww-daemon")
     hl.exec_cmd("wl-clip-persist --clipboard both")
     hl.exec_cmd("wl-paste --watch cliphist store")
@@ -166,11 +166,7 @@ bind(mainMod .. " + Print", "OCR area to clipboard", hl.dsp.exec_cmd(scripts .. 
 bind(mainMod .. " + SHIFT + V", "Clipboard history", hl.dsp.exec_cmd("cliphist list | rofi -dmenu | cliphist decode | wl-copy"))
 bind(mainMod .. " + Escape", "Lock screen", hl.dsp.exec_cmd("loginctl lock-session"))
 bind(mainMod .. " + SHIFT + Escape", "Power menu", hl.dsp.exec_cmd(scripts .. "hypr-wlogout"))
-bind(
-    mainMod .. " + SHIFT + P",
-    "Restart status bar",
-    hl.dsp.exec_cmd([[sh -c "pkill -9 -f 'gjs.*-ags\\.js'; pkill -9 -x hyprpanel-app; sleep 1; hyprctl dispatch 'hl.dsp.exec_cmd(\"hyprpanel\")'"]])
-)
+bind(mainMod .. " + SHIFT + P", "Restart status bar", hl.dsp.exec_cmd("wayle panel restart"))
 
 -- Brightness (notebook)
 bind("XF86MonBrightnessUp", "Brightness up", hl.dsp.exec_cmd("brightnessctl set 5%+"), { repeating = true })

@@ -20,6 +20,19 @@ find "$MOUNT" -type f -iname '*.mp4' -print -exec cp -n -t "$VDST" {} +
 echo "Listo: videos volcados a $VDST/"
 
 if [ "${1:-}" = "--clean" ]; then
+  unverified=0
+  while IFS=$'\t' read -r date path; do
+    cmp -s "$path" "$DST/$date/$(basename "$path")" || { echo "  Sin copia idéntica: $path"; unverified=1; }
+  done < <(find "$SRC" -type f -iname '*.arw' -printf '%TY-%Tm-%Td\t%p\n')
+  while read -r path; do
+    cmp -s "$path" "$VDST/$(basename "$path")" || { echo "  Sin copia idéntica: $path"; unverified=1; }
+  done < <(find "$MOUNT" -type f -iname '*.mp4')
+  [ "$unverified" -eq 0 ] || { echo "Abortado: no se borró nada"; exit 1; }
+
+  echo "Archivos NO importados que también se borrarán:"
+  find "$MOUNT" -type f ! \( -path "$SRC/*" -iname '*.arw' \) ! -iname '*.mp4'
+  read -rp "¿Borrar todo el contenido de $MOUNT? [y/N] " answer
+  [ "$answer" = y ] || { echo "Cancelado"; exit 0; }
   find "$MOUNT" -mindepth 1 -delete
   echo "SD limpiada: $MOUNT vacío"
 fi

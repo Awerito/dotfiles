@@ -13,3 +13,4 @@ image/heif=org.nomacs.ImageLounge.desktop
 image/jxl=org.nomacs.ImageLounge.desktop
 image/x-sony-arw=org.nomacs.ImageLounge.desktop
 application/pdf=org.pwmt.zathura-pdf-mupdf.desktop
+x-scheme-handler/slack=slack.desktop

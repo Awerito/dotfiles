@@ -97,3 +97,6 @@ icon-show = false
 label-color = "fg-default"
 button-bg-color = "transparent"
 left-click = "udiskie-umount -a"
+
+[wallpaper]
+transition-type = "grow"

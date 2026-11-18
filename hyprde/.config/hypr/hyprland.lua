@@ -120,7 +120,7 @@ hl.window_rule({ match = { title = "Picture in picture" }, float = true, pin = t
 hl.window_rule({ match = { class = "gsimplecal" }, float = true, pin = true, move = { 1080, 35 } })
 
 -- Chat apps -> workspace 1
-hl.window_rule({ match = { class = "Slack" }, workspace = "1 silent" })
+hl.window_rule({ match = { class = "slack" }, workspace = "1 silent" })
 hl.window_rule({ match = { class = "signal" }, workspace = "1 silent" })
 hl.window_rule({ match = { class = "com.rtosta.zapzap" }, workspace = "1 silent" })
 hl.window_rule({ match = { class = "brave-akpamiohjfcnimfljfndmaldlcfphjmp-Default" }, workspace = "1 silent" })
